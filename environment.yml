@@ -1,0 +1,36 @@
+# Analysis environment (Python 3.10).
+# The indicator code uses the momepy functional API with libpysal graphs.
+# OpenStreetMap streets are downloaded in a separate environment
+# (environment-download.yml) and read here from the cached GeoPackages.
+#
+#   conda env create -f environment.yml
+#   conda activate favela-xai
+name: favela-xai
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - geopandas=0.14.4
+  - shapely=2.1
+  - pyogrio=0.10
+  - pyproj=3.6
+  - momepy=0.8.1
+  - libpysal=4.12.1
+  - networkx=3.3
+  - numpy=1.26.4
+  - pandas=2.2.3
+  - scipy=1.11.4
+  - scikit-learn=1.3.2
+  - xgboost=1.7.6
+  - shap=0.45.1
+  - matplotlib=3.8.4
+  - pyarrow=15.0.2
+  - pyyaml=6.0.2
+  - rasterio=1.3.10
+  - rasterstats=0.19.0
+  - contextily=1.6.2
+  - pymupdf=1.24                # scales ED Fig. 5 and SI Fig. S22 to 183 mm (appendix/S13_boundary_robustness)
+  - tqdm
+  - pip
+  - pip:
+      - -e .

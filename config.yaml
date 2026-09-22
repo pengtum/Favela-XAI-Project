@@ -1,0 +1,986 @@
+# =============================================================================
+# Favela-XAI-Project: single configuration file
+#
+# "Building-scale morphological signatures of informal settlements"
+# (Luo, Duarte, Teixeira Coelho, Ratti).
+#
+# Every script reads this file through favela_xai.config.load_config().
+# * All paths are relative to the repository root (the folder of this file).
+# * Outputs of a script in <folder>/ go to outputs/<folder>/ (for example
+#   main/02_classification/ -> outputs/main/02_classification/).
+# * Comments give the manuscript item that each parameter belongs to:
+#   "Methods" = Methods of the main text, "SI" = Supplementary Information,
+#   "ED" = Extended Data. Main Figs 1-5, ED Figs 1-5, SI Figs S1-S23,
+#   SI Tables S1-S18.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# demo.enabled (or FAVELA_XAI_DEMO=1) restricts the run to the listed sites.
+# The demo layers are not distributed; point demo.raw to a small subset of the
+# raw layers (data/README.md) to use it.
+# -----------------------------------------------------------------------------
+demo:
+  enabled: false
+  sites: [palmeras]
+  outputs_root: outputs/demo
+  raw:
+    buildings_2013: data/demo/palmeiras_buildings_2013.gpkg
+    favelas_2013: data/demo/palmeiras_favela_boundaries_2013.gpkg
+    favelas_2019: data/demo/palmeiras_favela_boundaries_2019.gpkg
+
+# -----------------------------------------------------------------------------
+# Paths (repository-relative). See data/README.md for downloads.
+# -----------------------------------------------------------------------------
+paths:
+  outputs_root: outputs
+  raw:
+    # Edificacoes 2013 (Data.Rio), all Tipo classes
+    buildings_2013: data/raw/Edificacoes_2013/Edificacoes_2013.shp
+    # Limite Favelas 2013 (Data.Rio): official favela boundaries (labels, signed distance)
+    favelas_2013: data/raw/Limite_Favelas_2013/Limite_Favelas_2013.shp
+    # Limite Favelas 2019 (Data.Rio): 2013/2019 boundary overlay only (SI S10)
+    favelas_2019: data/raw/Limite_Favelas_2019/Limite_Favelas_2019.shp
+    # Data.Rio administrative layers (SI S2 site context; Fig. 1a outline)
+    municipality: data/raw/context/Limite_Municipio.geojson
+    planning_areas: data/raw/context/Limite_Areas_Planejamento.geojson
+    bairros: data/raw/context/Limite_Bairros.geojson
+    # OpenStreetMap streets per site, <site>.gpkg (block-complexity index k, SI S9)
+    osm_streets_dir: data/raw/osm_streets
+    # Cached basemap tiles for Fig. 1a (optional download, CARTO/OSM attribution)
+    basemap_cache_dir: data/raw/context/basemap_cache
+    # 5 m LiDAR digital terrain model (SI S11), available from the Instituto
+    # Municipal de Urbanismo Pereira Passos (IPP) on request. Set the path to
+    # the local GeoTIFF (EPSG:31983); scripts that need it stop with a message
+    # while this is null.
+    elevation_raster: null
+
+# Shared intermediate products, relative to the outputs root. {site} is
+# replaced by the site key. Scripts read upstream results only through these
+# entries (favela_xai.config.Config.product).
+products:
+  # main/01_features
+  footprints_clean: main/01_features/{site}_footprints_clean.gpkg
+  features_gpkg: main/01_features/{site}_buildings_features.gpkg
+  preprocessing_report: main/01_features/preprocessing_report.csv
+  site_counts: main/01_features/site_counts.csv
+  signed_distance: main/01_features/signed_distance.parquet
+  # main/02_classification
+  model_json: main/02_classification/{site}_model.json
+  imputer_medians: main/02_classification/{site}_imputer_medians.csv
+  split_csv: main/02_classification/{site}_split.csv
+  shap_gpkg: main/02_classification/{site}_buildings_shap.gpkg
+  site_metrics: main/02_classification/table_S3_site_metrics.csv
+  oof_predictions: main/02_classification/oof_predictions.parquet
+  # main/03_site_signatures
+  importance_favela: main/03_site_signatures/persite_importance_favela.csv
+  # main/04_boundary_profiles
+  transition_metrics: main/04_boundary_profiles/transition_metrics.csv
+  # main/05_attribution_plane
+  attribution_pca_scores: main/05_attribution_plane/attribution_pca_scores.parquet
+  # appendix/S12_spatial_cv
+  spatial_cv_folds: appendix/S12_spatial_cv/folds_all.parquet
+
+# -----------------------------------------------------------------------------
+# Study sites (Methods 4.1; SI S2).
+# key: site identifier used in file names; name: display name;
+#   latex: name as typeset in the SI tables.
+# window: rectangular analysis window around the favela of interest,
+#   [xmin, ymin, xmax, ymax] in EPSG:31983.
+# extract_records: number of 2013 footprints in the window (ten sites:
+#   188,735 buildings, Methods 4.1).
+# The list order (alphabetical by key) is the order used by every loop and by
+# every site bootstrap; do not reorder it.
+# -----------------------------------------------------------------------------
+sites:
+  - {key: barao,                  name: "Barão",                  latex: "Bar\\~ao",                  window: [669189.23, 7465793.59, 670344.10, 7466986.58], extract_records: 4487}
+  - {key: catumbi,                name: "Catumbi",                latex: "Catumbi",                   window: [683451.87, 7463174.11, 685536.33, 7465393.27], extract_records: 22825}
+  - {key: faz_quem_quer,          name: "Faz Quem Quer",          latex: "Faz Quem Quer",             window: [669867.86, 7471092.84, 670942.72, 7472156.09], extract_records: 4727}
+  - {key: fazena_coqueiro,        name: "Fazenda Coqueiro",       latex: "Fazenda Coqueiro",          window: [653043.94, 7468829.25, 655094.29, 7470870.19], extract_records: 20582}
+  - {key: grotao_de_costa_barros, name: "Grotão de Costa Barros", latex: "Grot\\~ao de Costa Barros", window: [665302.12, 7473904.49, 667341.10, 7476106.42], extract_records: 23768}
+  - {key: jacarezinho,            name: "Jacarezinho",            latex: "Jacarezinho",               window: [676981.38, 7466263.28, 680130.66, 7469398.94], extract_records: 43435}
+  - {key: morro_da_guaiba,        name: "Morro da Guaíba",        latex: "Morro da Gua\\'iba",        window: [674239.96, 7473212.14, 675270.70, 7474260.26], extract_records: 6697}
+  - {key: nova_cidade,            name: "Nova Cidade",            latex: "Nova Cidade",               window: [643317.18, 7465241.82, 645737.96, 7467633.05], extract_records: 24086}
+  - {key: palmeras,               name: "Palmeiras",              latex: "Palmeiras",                 window: [657342.22, 7456311.67, 658185.50, 7457158.96], extract_records: 1996}
+  - {key: rocinha,                name: "Rocinha",                latex: "Rocinha",                   window: [677435.90, 7455338.60, 683507.64, 7459758.79], extract_records: 36132}
+
+# Row / panel orders used in the manuscript (layout only).
+display_orders:
+  # SI Table S3 (per-site classification performance)
+  table_S3: [rocinha, palmeras, nova_cidade, morro_da_guaiba, jacarezinho, grotao_de_costa_barros, fazena_coqueiro, faz_quem_quer, catumbi, barao]
+  # Main Fig. 5 panels a-j
+  figure5_panels: [catumbi, faz_quem_quer, barao, morro_da_guaiba, rocinha, nova_cidade, palmeras, fazena_coqueiro, grotao_de_costa_barros, jacarezinho]
+  # SI Table S8 (2013/2019 boundary overlay)
+  table_S8: [jacarezinho, catumbi, rocinha, grotao_de_costa_barros, barao, faz_quem_quer, palmeras, nova_cidade, morro_da_guaiba, fazena_coqueiro]
+
+# -----------------------------------------------------------------------------
+# Coordinate reference system
+# -----------------------------------------------------------------------------
+crs: "EPSG:31983"   # SIRGAS 2000 / UTM zone 23S, metres (Methods 4.8; SI S11)
+
+# -----------------------------------------------------------------------------
+# Footprint pre-processing (Methods 4.2; SI S1), implemented in Python in
+# favela_xai.features.preprocess_footprints.
+# -----------------------------------------------------------------------------
+preprocessing:
+  make_valid_method: structure          # geometry repair with the 'structure' method
+  remove_duplicate_geometries: true     # duplicate geometries removed
+  multipart_to_singlepart: true         # multipart features converted to singlepart
+  simplify_tolerance_m: 0.1             # Douglas-Peucker tolerance (metres)
+  simplify_preserve_topology: true      # topology-preserving simplification
+  final_validity_check: true            # second validity check after simplification
+  # Buildings kept in a site window: within | intersects the window rectangle.
+  window_predicate: within
+  # Footprints are read from the raw layer inside the window padded by this
+  # distance before cleaning (reading only; the window predicate is applied
+  # after cleaning).
+  read_pad_m: 50
+
+# -----------------------------------------------------------------------------
+# Morphological tessellation (Methods 4.2). Footprints that are too small or
+# fail the tessellation stage are discarded.
+# -----------------------------------------------------------------------------
+tessellation:
+  min_area_m2: 1.0       # footprints below this area are excluded
+  limit_buffer_m: 100    # momepy.buffered_limit buffer
+  shrink: 0.4            # momepy.morphological_tessellation
+  segment: 0.5           # momepy.morphological_tessellation
+
+# -----------------------------------------------------------------------------
+# The 25 indicators (Methods 4.3; SI S3; SI Table S2). The registry (names,
+# figure labels, dimensions, momepy calls) is in favela_xai/features.py.
+# -----------------------------------------------------------------------------
+indicators:
+  # Distance band of the spatial indicators (200 m around each building;
+  # Methods 4.5; SI S12)
+  neighbourhood_band_m: 200
+  tessellation_contiguity: queen   # libpysal Graph.build_contiguity(rook=False)
+  # Contiguity graph passed to momepy.building_adjacency:
+  # tessellation = queen contiguity of the tessellation cells;
+  # buildings = queen contiguity of the footprints.
+  adjacency_contiguity: tessellation
+  corners_include_interiors: true  # momepy.corners counts interior rings
+  # Number of indicators per dimension (Fig. 1; Methods 4.3; SI Table S2),
+  # checked against the registry by favela_xai.features.check_registry().
+  dimension_sizes: {Dimension: 3, Shape: 13, Spatial distribution: 4, Configuration: 3, Connectivity: 2}
+
+# -----------------------------------------------------------------------------
+# Favela labels (Methods 4.1): a building is labelled favela when it falls
+# within the official 2013 favela boundaries.
+# -----------------------------------------------------------------------------
+labels:
+  rule: footprint_intersects   # footprint_intersects | centroid_within (dissolved 2013 polygons)
+  dissolve_polygons: true
+  favela: favela
+  formal: not-favela
+
+# -----------------------------------------------------------------------------
+# Main per-site classifier (Methods 4.4). Used for SI Table S3, Fig. 2b, all
+# Tree-SHAP attributions of the main analysis, SI S8 transfer and SI S11.
+# -----------------------------------------------------------------------------
+model_main:
+  n_estimators: 200       # Methods 4.4: 200 trees
+  max_depth: 6            # Methods 4.4
+  learning_rate: 0.1      # Methods 4.4
+  random_state: 42        # Methods 4.4
+  test_size: 0.2          # Methods 4.4: stratified 80/20 train/test split
+  stratify: true          # Methods 4.4
+  split_random_state: 42  # Methods 4.4
+  eval_metric: logloss    # XGBoost evaluation metric
+  # Missing indicator values: median of the training rows, applied to all
+  # buildings of the site.
+  imputation: median
+  positive_class: favela  # class 1 = favela (SI Table S3)
+
+# -----------------------------------------------------------------------------
+# Validation-pipeline classifier (Methods 4.5 and 4.7; SI S5, S12, S14):
+# XGBoost with 100 trees and seed 432, other settings at their defaults,
+# missing indicator values imputed with the training median.
+# -----------------------------------------------------------------------------
+model_cv:
+  n_estimators: 100       # Methods 4.5, 4.7; SI S5, S12, S14
+  random_state: 432       # Methods 4.5, 4.7; SI S5, S12, S14
+  eval_metric: logloss    # XGBoost evaluation metric
+  imputation: median      # training median (a column with no values -> 0)
+  # true: the classifier is fitted with formal settlement as class 1 and the
+  # favela probability is taken as 1 - p.
+  fit_formal_as_class_1: true
+
+# Out-of-fold predictions for every building (Methods 4.7; Main Fig. 2c; ED Fig. 1; SI S5, S14)
+oof:
+  n_folds: 5              # Methods 4.7: stratified five-fold cross-validation
+  shuffle: true
+  random_state: 432       # Methods 4.7
+
+# -----------------------------------------------------------------------------
+# Tree SHAP (Methods 4.6): exact Tree SHAP of each site's classifier, an
+# N x 25 matrix per site, raw margin (log-odds) output (SI S7); positive values
+# push a building toward the favela class (Main Figs 3 and 4).
+# -----------------------------------------------------------------------------
+shap:
+  model_output: raw
+  explain: all_buildings   # SHAP of every building of the site
+
+# -----------------------------------------------------------------------------
+# Signed distance to the official 2013 favela boundary (Methods 4.7 and 4.8):
+# Euclidean distance (metres, EPSG:31983) from the building centroid to the
+# nearest edge of the official 2013 favela polygon, negative for favela
+# buildings (inside the polygon) and positive for non-favela buildings.
+# -----------------------------------------------------------------------------
+signed_distance:
+  sign_by: label              # negative for favela-labelled buildings (Methods 4.8)
+  polygon_search_pad_m: 300   # polygons intersecting the site's building extent + 300 m
+  # false = edges of the individual 2013 polygons (an edge shared by two
+  # adjacent favela polygons counts as boundary); true = boundary of the
+  # dissolved union (the interface between favela and non-favela ground).
+  # Used by every boundary analysis (Fig. 2c, ED Fig. 1, SI Table S4, Fig. 4,
+  # SI Table S5, SI S6.1, S13, S14).
+  dissolve_polygons: false
+
+# -----------------------------------------------------------------------------
+# Misclassification rate by signed distance (Methods 4.7; Main Fig. 2c;
+# ED Fig. 1; SI S5; SI Table S4).
+# -----------------------------------------------------------------------------
+boundary_errors:
+  bin_width_m: 6                   # 6 m signed-distance bins (Methods 4.7; Fig. 2c)
+  half_range_m: 90                 # Fig. 2c axis; ED Fig. 1: buildings beyond 90 m pooled into one end bin per side
+  min_buildings_per_site_bin: 30   # Fig. 2c: site bins with fewer buildings omitted
+  site_band_percentiles: [10, 90]  # Fig. 2c: grey band, 10th-90th percentile of site rates
+  band_edges_m: [0, 6, 30, 90]     # SI Table S4: <6, 6-30, 30-90, >=90 m (last band open)
+  near_far_bands: [0, 3]           # Results 2.1 / SI S5: rate within 6 m over rate at 90 m or more
+  wilson_z: 1.959963984540054      # Wilson 95% intervals per bin (Methods 4.7)
+  bootstrap_resamples: 2000        # ED Fig. 1 / SI Table S4: resamples of the ten sites, buildings pooled within each resample
+  bootstrap_seed: 42
+  # Blocked rates (Results 2.1; SI S5): 250 m blocks and a 200 m training buffer
+  blocked_design: {block_m: 250, buffer_m: 200, grid_placement: 0}   # grid_placement: index of the grid placement
+
+# -----------------------------------------------------------------------------
+# Boundary profiles and transition metrics (Methods 4.8; Main Fig. 4;
+# SI Table S5; SI Table S17; ED Fig. 5).
+# -----------------------------------------------------------------------------
+boundary_profiles:
+  bin_width_m: 2.5                 # Methods 4.8: 2.5 m signed-distance bins
+  half_range_m: 40                 # profile range, +/- this distance
+  min_buildings_per_site_bin: 20   # minimum buildings per bin and site (Fig. 4; SI Table S17)
+  # Gaussian smoothing (sigma in bins) of the binned profile before x0 and w
+  # are taken (Fig. 4; SI Table S17; ED Fig. 5). 0 or null = no smoothing.
+  smoothing_sigma_bins: 1.0
+  deep_band_m: 25                  # dS = mean of bins <= -25 m minus mean of bins >= +25 m (ED Fig. 5; SI Table S17)
+  resolved_min_abs_delta_s: 0.1    # Methods 4.8: resolved transition if |dS| >= 0.1
+  min_valid_bins: 6                # minimum number of populated bins of a profile
+
+# -----------------------------------------------------------------------------
+# Direction of the boundary transition (SI S6.1; SI Fig. S9).
+# -----------------------------------------------------------------------------
+boundary_direction:
+  deep_threshold_m: 50             # deep favela d < -50 m, deep formal d > +50 m
+  boundary_zone_m: 20              # boundary zone |d| <= 20 m, split by side
+  min_buildings_per_group: 30      # minimum buildings per group and site
+  # Sensitivity sweep of the reference-class threshold (50-150 m) and the
+  # boundary zone (10-30 m) (SI S6.1)
+  sweep_deep_threshold_m: [50, 75, 100, 125, 150]
+  sweep_boundary_zone_m: [10, 15, 20, 25, 30]
+  pooled_statistic: mean_over_sites   # pooled value = unweighted mean over sites
+
+# -----------------------------------------------------------------------------
+# Site-level attribution summaries (Main Fig. 3; ED Fig. 2 per-site importance;
+# SI Figs S7 and S8 dependence).
+# -----------------------------------------------------------------------------
+importance:
+  population: favela_buildings     # ED Fig. 2: mean |Tree SHAP| over each site's favela buildings
+  dominant_feature: argmax_signed  # Fig. 3a: indicator with the largest signed SHAP value of the building
+dependence:
+  # SI Fig. S7: pooled trend and per-site trends (binning)
+  pooled: {n_bins: 12, percentile_range: [1, 99], min_buildings_per_bin: 20, points_per_class: 1200, seed: 42}
+  # SI Fig. S8: heterogeneity score = mean cross-site s.d. of binned means
+  heterogeneity: {n_bins: 15, percentile_range: [1, 98], min_buildings_per_bin: 25}
+
+# -----------------------------------------------------------------------------
+# Pooled attribution PCA (Methods 4.6; Main Fig. 5; SI S7; SI Fig. S10).
+# -----------------------------------------------------------------------------
+pca:
+  standardise: true                # each attribution column standardised over the buildings of all ten sites (population s.d.)
+  pooled_over_sites: true          # one PCA of the pooled matrix
+  components_kept: 2               # first two components
+  # Sign conventions: PC1 oriented so that the pooled favela mean is above the
+  # formal mean; PC2 oriented so that its largest absolute loading is positive.
+  orient_pc1: favela_positive
+  orient_pc2: largest_loading_positive
+  density_top_share: 0.15          # Fig. 5: regions = 15% of grid cells with the highest kernel density of each class
+  points_per_class: 2000           # Fig. 5: up to 2,000 sampled buildings drawn per class
+  sample_seed: 42
+  kde_max_buildings_per_site: 20000   # buildings sampled per site for the kernel density
+  kde_grid_size: 150               # kernel-density grid size
+  youden_threshold: per_site       # SI S7 / SI Fig. S10: PC1 thresholded within each site at its ROC-Youden optimum
+  # Raw-indicator benchmark (Results 2.4; SI S7; SI Table S6): two-component
+  # PCA of the 25 raw indicators, fitted within each site, unstandardised
+  raw_benchmark: {components: 2, standardise: false, per_site: true}
+
+# -----------------------------------------------------------------------------
+# Cross-site transfer (Methods 4.11; SI S8; SI Figs S11-S12).
+# -----------------------------------------------------------------------------
+transfer:
+  classifier: model_main           # per-site classifier of Methods 4.4 (SI S4)
+  target: test_split               # evaluated on the held-out test split of every other site
+  target_imputation: target_training_medians   # target test rows imputed with the target site's training medians
+  metric: balanced_accuracy        # mean of favela recall and formal-settlement recall
+  bootstrap_resamples: 10000       # site bootstrap
+  bootstrap_seed: 20260917
+  indicator_standardisation: pooled_median_iqr   # (x_k - m_k)/q_k, pooled median m_k, pooled IQR q_k (1 where zero)
+  mantel_permutations: 9999        # Mantel test permutations (SI S8)
+  mantel_seed: 42                  # SI S8
+  multiple_testing: benjamini_hochberg   # across the seven between-site measures (SI S8)
+
+# -----------------------------------------------------------------------------
+# Block-complexity index k (Methods 4.9; SI S9; SI Tables S6-S7; SI Fig. S13).
+# -----------------------------------------------------------------------------
+block_complexity:
+  osm_bbox_pad_m: 200              # streets within the building bounding box padded by 200 m
+  osm_excluded_highway: [abandoned, construction, planned, proposed, raceway, razed]   # excluded highway values
+  osm_exclude_area_yes: true       # ways tagged area=yes excluded
+  osm_access_date: null            # date of the street download (record here)
+  min_block_area_m2: 100           # blocks retained if area > 100 m2
+  study_area_buffer_m: 50          # study area = buildings buffered by 50 m
+  min_shared_boundary_m: 0.01      # cells sharing more than 1 cm of boundary are adjacent
+  frontier_buffer_m: 0.5           # cells touching the block boundary (0.5 m buffer) get k = 1
+  tessellation_fallback_buffer_m: 0.5   # cell = building buffered by 0.5 m where a block's tessellation fails
+  # SI S9 per-site protocol (SI Table S6): stratified 80/20 split (seed 42),
+  # classifier of Methods 4.4
+  persite: {classifier: model_main, test_size: 0.2, stratify: true, split_random_state: 42}
+  # SI Table S7: stratified five-fold cross-validation, classifier of
+  # Methods 4.4
+  pooled: {classifier: model_main, n_folds: 5, shuffle: true, random_state: 42}
+  figure_k_clip: 12                # SI Fig. S13: k clipped at 12
+
+# -----------------------------------------------------------------------------
+# Terrain ablation (Methods 4.10; SI S11; SI Table S9; SI Figs S14-S18).
+# The elevation raster path is paths.raw.elevation_raster (user-supplied).
+# -----------------------------------------------------------------------------
+terrain:
+  resolution_m: 5                  # 5 m digital terrain model (SI S11)
+  slope_method: finite_difference  # finite-difference gradient over 5 m cells (degrees)
+  zonal_statistics: [elev_mean, elev_min, elev_max, elev_std, elev_range, slope_mean, slope_median, slope_std, slope_max]   # per-building statistics (SI S11)
+  zonal_all_touched: true          # every raster cell touching the footprint counts
+  building_set: main_analysis      # per-site building set of the main analysis
+  classifier: model_main           # per-site classifier of Methods 4.4 (SI Table S9)
+  shared_split: true               # terrain and combined models reuse the morphology model's split
+  ovl_kde_bandwidth: 0.3           # kernel bandwidth of the overlap coefficient (OVL)
+  ovl_grid_points: 500             # grid size of the overlap coefficient
+  hillside_min_favela_slope_deg: 10   # SI Table S1: hillside if the favela mean slope is at least 10 deg
+  flat_max_favela_slope_deg: 6        # SI Table S1: flat if it is below 6 deg
+
+# -----------------------------------------------------------------------------
+# Site selection and context (SI S2; SI Table S1; SI Fig. S1).
+# -----------------------------------------------------------------------------
+site_context:
+  city_centre_lonlat: [-43.1729, -22.9028]   # Praça XV, historic centre (SI S2; SI Fig. S1)
+  study_favela_rule: contains_favela_centroid   # study favela: polygon containing the centroid of at least one favela-labelled building of a site
+  density_all_tipo: true           # SI Fig. S1e: all footprint types of the 2013 building layer
+  comparison_test: ks_2samp        # SI Fig. S1: two-sample Kolmogorov-Smirnov test
+  context_simplify_m: 20           # map generalisation only
+  map_min_part_area_ha: 5          # map generalisation only
+
+# -----------------------------------------------------------------------------
+# 2013/2019 boundary overlay (Methods 4.12; SI S10; SI Table S8).
+# -----------------------------------------------------------------------------
+boundary_overlay:
+  rule: footprint_intersects       # favela in a year if the footprint intersects that year's dissolved polygons
+  dissolve_polygons: true          # Methods 4.12
+
+# -----------------------------------------------------------------------------
+# Spatial cross-validation (Methods 4.5; SI S12; SI Tables S10-S16;
+# SI Figs S19-S21; ED Figs 3-4 ranking stability). Model: model_cv.
+# -----------------------------------------------------------------------------
+spatial_cv:
+  n_folds: 5                       # blocks assigned whole to five folds
+  block_sizes_m: [100, 250, 500, 1000]   # square blocks (Methods 4.5; SI S12)
+  grid_placements: 3               # independent grid placements
+  placement_seed_base: 1000        # grid offsets U[0, L)^2 from default_rng(1000 + placement)
+  fold_seed: 42                    # greedy balanced fold assignment shuffles blocks with seed 42 + placement
+  buffers_m: [0, 50, 100, 200, 300, 400]   # training buffers (SI S12)
+  primary: {block_m: 250, buffer_m: 200}   # primary design (SI S12)
+  control_seed_base: 42            # matched control: RandomState(42 + fold + 100 * placement)
+  # Alternative units (SI S12)
+  hexagon_sizes_m: [250, 500]      # hexagonal cells with the area of a 250 m and of a 500 m square
+  kmeans_unit_sizes_m: [250, 500]  # k-means clusters covering on average the area of a 250 m or a 500 m square
+  kmeans_min_clusters: 5
+  kmeans_n_init: 10
+  kmeans_seed: 42
+  kmeans_fold_clusters: 5          # five k-means clusters used directly as the five folds
+  ten_fold: {n_folds: 10, block_sizes_m: [250, 500]}   # ten folds instead of five, at 250 and 500 m
+  sensitivity_buffers_m: [0, 200]  # training buffers of the alternative-unit and ten-fold designs
+  component_min_buildings_per_class: 100   # held-out favela component groups hold at least 100 buildings of each class
+  component_buffers_m: [0, 200]    # held-out favela component without and with the 200 m buffer
+  min_train_buildings: 50          # a fold is not fitted with fewer training buildings
+  references:
+    random_split: {test_size: 0.2, stratify: false, random_state: 432}   # random 80/20 split refitted in this pipeline (unstratified)
+    five_fold: {n_folds: 5, shuffle: true, random_state: 432}           # random five-fold cross-validation refitted in this pipeline
+  scoring:
+    min_minority_train: 50         # Methods 4.5 / SI S12: at least 50 training buildings of the minority class
+    min_favela_coverage: 0.5       # Methods 4.5 / SI S12: at least half of the site's favela buildings predicted
+    per_grid_placement: true       # coverage rule applied per grid placement
+    bootstrap_resamples: 2000      # resamples of the scored sites (SI S12)
+    bootstrap_seed: 42
+  ranking:
+    five_fold_seeds: [432, 7, 99, 2024]   # SI Table S16 / ED Fig. 3: random five-fold, four shuffle seeds
+    null_split_seeds: [7, 99, 2024]       # SI Table S16: split seeds of the split-refit null
+    null_model_seed: 432                  # SI S12: model seed of the split-refit null
+    # Model of the split-refit null (SI S12 'Stability of the attributions'):
+    # model_cv = validation-pipeline model (100 trees, seed null_model_seed) on
+    # an unstratified 80/20 split; model_main = the Methods 4.4 model on a
+    # split stratified as in model_main.
+    null_classifier: model_cv
+    share_population: favela_buildings    # ED Fig. 3: share of mean |SHAP| over favela buildings
+    top_k: 3                              # SI Table S16 / ED Fig. 3: three leading indicators
+  distances:
+    min_test_buildings_per_bin: 200   # SI Fig. S20: at least 200 test buildings per bin ...
+    min_sites_per_bin: 5              # ... from at least five sites
+    bin_edges_m: [0, 5, 10, 25, 50, 100, 200, 400, 800]   # distance bins (last bin open)
+
+# -----------------------------------------------------------------------------
+# Robustness of the boundary analyses (SI S13; ED Fig. 5; SI Fig. S22;
+# SI Table S17).
+# -----------------------------------------------------------------------------
+boundary_robustness:
+  n_shifted_boundaries: 20         # SI S13 / ED Fig. 5: twenty shifted boundaries
+  shift_range_m: [150, 400]        # rigid shifts of 150-400 m in a uniformly random direction
+  shift_seed_base: 0               # shift k uses default_rng(k)
+  max_slope_window_m: 20           # ED Fig. 5: maximum slope within +/-20 m
+  gradient_near_m: 10              # ED Fig. 5: mean within 10 m of the line
+  gradient_far_m: [25, 40]         # ED Fig. 5: mean at 25-40 m
+  raw_standardisation: site_median_iqr   # (value - median)/IQR per site, positive = favela-like (ED Fig. 5; SI Fig. S22)
+  raw_bootstrap_resamples: 500     # site-bootstrap interval of the raw profiles
+  raw_bootstrap_seed: 42
+  near_line_rule: centroid_distance_below_sqrt_area   # SI S13: centroid closer to the line than the square root of the footprint area
+  x0_rigid_shift_m: 2.5            # SI S13 / SI Table S17: boundary translated rigidly by 2.5 m ...
+  x0_directions: 8                 # ... in each of eight directions
+  shift_distances_m: [2.5, 5, 10]  # SI Table S17: rigid shifts of 2.5, 5 or 10 m and per-polygon random shifts
+  per_polygon_runs: 20             # SI Table S17: 20 runs per distance
+  per_polygon_seed_base: 5000      # seed base of the per-polygon shifts
+
+# -----------------------------------------------------------------------------
+# Label-free clustering (Methods 4.13; SI S14; SI Table S18; SI Fig. S23).
+# -----------------------------------------------------------------------------
+label_free:
+  transform: rank_to_normal        # indicators rank-transformed to normality (QuantileTransformer, normal output)
+  n_quantiles_max: 1000            # upper limit of QuantileTransformer n_quantiles
+  imputation: median               # missing indicator values
+  n_clusters: [2, 3, 4, 5, 6]      # Methods 4.13: 2-6 clusters
+  algorithms: [kmeans, ward]       # k-means and Ward hierarchical clustering
+  ward_max_sample: 4000            # Ward fitted on at most 4,000 randomly drawn buildings
+  kmeans_n_init: 10
+  seed: 42
+  weightings: [all_equal, dimensions_balanced, one_component_per_dimension]   # the three indicator weightings (SI S14)
+  profile_bin_width_m: 6           # boundary profile in 6 m bins (SI S14)
+  profile_half_range_m: 90         # profile range, +/- this distance
+  profile_min_buildings_per_bin: 20   # minimum buildings per bin
+  profile_normalise_at_m: 50       # profile = 1 in the favela interior (d <= -50 m), 0 in the formal interior (d >= 50 m)
+  supervised_reference: oof        # out-of-fold predictions of the validation pipeline (SI S12, S14)
+
+# Default site bootstrap used where an analysis gives no other setting
+# (Main Fig. 2 and SI S12: 2,000 resamples of the sites).
+site_bootstrap:
+  resamples: 2000
+  seed: 42
+
+# -----------------------------------------------------------------------------
+# main/03_site_signatures: Main Fig. 3 (dominant-feature maps, Tree-SHAP maps
+# and dependence insets). The importance and dominant-feature rules are in
+# 'importance' above; the settings below are those of the figure.
+# -----------------------------------------------------------------------------
+main_03_site_signatures:
+  # Fig. 3b: the two contrasting favelas
+  hero_sites: [rocinha, barao]
+  # Fig. 3b: indicators of the per-building Tree-SHAP maps
+  hero_features: [mean_interbuilding_distance, squareness]
+  # Fig. 3a: the other eight sites, in panel order (layout only)
+  panel_a_order: [morro_da_guaiba, jacarezinho, faz_quem_quer, catumbi, palmeras, fazena_coqueiro, nova_cidade, grotao_de_costa_barros]
+  # Fig. 3a shortened panel titles (layout only); other sites use 'name' in
+  # 'sites'.
+  short_names: {grotao_de_costa_barros: "Grotão de C.B."}
+  # Fig. 3b map window [xmin, ymin, xmax, ymax], EPSG:31983; sites not listed
+  # are shown in full.
+  zoom_windows:
+    rocinha: [679720, 7455500, 680980, 7456680]
+  # Fig. 3a: each favela building coloured by its dominant feature; the most
+  # frequent dominant features over the favela buildings of all sites get
+  # their own colour, all others 'other feature'.
+  n_legend_features: 6
+  # Fig. 3b SHAP maps: symmetric colour limit at this percentile of |SHAP|
+  # over the two sites of panel b.
+  shap_colour_percentile: 99
+  # Boundary line drawn on the Fig. 3b SHAP maps: official_2013 = the official
+  # 2013 favela boundary (as in signed_distance.*); label_hull = hull of the
+  # favela-labelled footprints (parameters in label_hull).
+  outline: official_2013
+  label_hull: {simplify_m: 1, grow_m: 10, shrink_m: 6, final_simplify_m: 2}
+  # Fig. 3b insets: SHAP dependence (dots, buildings; bold line, this favela;
+  # dashed, pooled over all ten sites) as binned means in n_bins equal bins
+  # between the pooled percentiles; bins with fewer buildings left empty; at
+  # most points_per_class dots per class.
+  inset: {n_bins: 16, percentile_range: [1, 98], min_buildings_per_bin: 20, points_per_class: 700, seed: 5}
+
+# -----------------------------------------------------------------------------
+# main/04_boundary_profiles: Main Fig. 4 drawing. The profile and transition
+# settings are in 'boundary_profiles' above.
+# -----------------------------------------------------------------------------
+main_04_boundary_profiles:
+  # Fig. 4 sign-flip dot, shown where |dS| >= 0.1; opacity =
+  # clip(|dS| / full_at_abs_delta_s, minimum, 1).
+  dot_opacity: {full_at_abs_delta_s: 0.6, minimum: 0.42}
+
+# -----------------------------------------------------------------------------
+# main/05_attribution_plane: Main Fig. 5 kernel-density regions and panel
+# statistics. The PCA and the other Fig. 5 settings are in 'pca' above.
+# -----------------------------------------------------------------------------
+main_05_attribution_plane:
+  # Gaussian kernel density of each class on a grid spanning the 1st-99th
+  # percentile box of the site's (sub-sampled) buildings; bandwidth
+  # n^(-1/6) x mean standard deviation of PC1 and PC2, clipped to the range
+  # below; a class with fewer than kde_min_points buildings gets no region.
+  kde_quantile_box: [0.01, 0.99]
+  kde_bandwidth_clip: [0.05, 2.0]
+  kde_min_points: 30
+  # Out-of-fold AUC of a logistic regression on PC1 and PC2 within each site
+  # (written to panel_stats.csv).
+  panel_auc: {n_folds: 5, shuffle: true, seed: 42, max_iter: 1000}
+  # Colour of each site's panel in Main Fig. 5 (layout only).
+  site_colours:
+    catumbi: "#4c72b0"
+    faz_quem_quer: "#dd8452"
+    barao: "#55a868"
+    fazena_coqueiro: "#c44e52"
+    grotao_de_costa_barros: "#8172b2"
+    jacarezinho: "#937860"
+    morro_da_guaiba: "#da8bc3"
+    nova_cidade: "#8c8c8c"
+    palmeras: "#ccb974"
+    rocinha: "#64b5cd"
+  # Raw-indicator benchmark of Results 2.4 (SI S7; SI Table S6), computed by
+  # appendix/S09_block_complexity_k/03_persite_protocol.py (protocol in
+  # 'block_complexity.persite' and 'pca.raw_benchmark'); summary file read by
+  # 03_raw_benchmark_numbers.py, relative to the outputs root.
+  raw_benchmark_summary: appendix/S09_block_complexity_k/k_persite_summary.csv
+
+# -----------------------------------------------------------------------------
+# appendix/S11_terrain: terrain ablation (Methods 4.10; SI S11; SI Table S9;
+# SI Figs S14-S18). Shared terrain settings are in 'terrain' above; the
+# raster path is paths.raw.elevation_raster. The settings below are those of
+# this folder.
+# -----------------------------------------------------------------------------
+appendix_S11_terrain:
+  # Column order of the nine terrain features in the Terrain model; the
+  # Combined model uses the 25 indicators (model order) followed by these.
+  model_feature_order: [elev_mean, elev_min, elev_max, elev_range, elev_std, slope_mean, slope_max, slope_median, slope_std]
+  # Split used only when terrain.classifier is model_cv: 80/20, unstratified,
+  # seed 432. With model_main the split is that of model_main (Methods 4.4).
+  model_cv_split: {test_size: 0.2, stratify: false, random_state: 432}
+  slope_nodata: -9999.0            # nodata value of the slope raster
+  dtm_nodata_fallback: -9999.0     # used when the DTM declares no nodata value
+  # Rows explained by Tree SHAP of the Terrain and Combined models (SI Figs
+  # S16, S18, averaged across sites): the test buildings of each site.
+  shap_rows: test_set
+  # Accuracy plotted against the slope gap (SI Fig. S14) and the overlap
+  # (SI Fig. S15): table_S3 = per-site accuracies of SI Table S3
+  # (products.site_metrics); ablation_morph = Morph column of SI Table S9.
+  figure_accuracy: table_S3
+  # Buildings of the favela / non-favela kernel-density estimates of mean
+  # slope and mean elevation (SI S11): all_buildings = every building of the
+  # site; test_set = the test buildings of the ablation split.
+  ovl_population: all_buildings
+  ovl_variables: [slope_mean, elev_mean]   # mean slope and mean elevation (SI S11)
+  ovl_grid_pad_fraction: 0.05      # grid = pooled range +/- 5%
+  ovl_min_buildings: 3             # OVL undefined below this per class
+  ridge_min_buildings: 5           # ridge not drawn below this per class
+  combined_top_n: 20               # SI Fig. S18: top 20 features
+  # Layout only: x-axis order of SI Fig. S17; short site names in SI Figs S14,
+  # S15 and S17 (other sites: 'name' in 'sites').
+  figure_site_order: [rocinha, barao, morro_da_guaiba, jacarezinho, faz_quem_quer, catumbi, fazena_coqueiro, palmeras, grotao_de_costa_barros, nova_cidade]
+  figure_short_names: {grotao_de_costa_barros: "Grotão"}
+  # Tick labels of the morphological indicators in SI Fig. S18: keys = column
+  # names; table_S2 = figure labels of SI Table S2.
+  morph_feature_labels: keys
+  # Class colours of SI Fig. S15: favela, non-favela and their overlap zone.
+  fig_S15_colours: {favela: "#D62728", formal: "#0F4D92", overlap: "#8E7CB5"}
+
+# -----------------------------------------------------------------------------
+# main/01_features (footprints, tessellation, the 25 indicators, SI Table S2,
+# Main Fig. 1 element maps). Processing settings are in 'preprocessing',
+# 'tessellation', 'indicators', 'labels' and 'signed_distance' above; this
+# section holds what only this folder uses.
+# -----------------------------------------------------------------------------
+main_01_features:
+  # Attributes of the 2013 footprint layer carried into every per-site table so
+  # that each building can be traced back to the municipal layer.
+  keep_source_columns: [cod_unico, Tipo]
+  # Building totals of Methods 4.1 (footprints of the ten site windows before
+  # the tessellation stage); 04_site_summary.py prints them next to the
+  # computed counts.
+  manuscript_totals: {buildings: 188735, favela: 82015}
+  figure1:
+    # --- Fig. 1a study-area map (layout) ---
+    # Basemap tiles (optional download, 07_fig1_basemap.py);
+    # (c) OpenStreetMap contributors, (c) CARTO.
+    basemap_provider: CartoDB.PositronNoLabels
+    basemap_zoom: 13
+    basemap_attribution: "(c) OpenStreetMap contributors (c) CARTO"
+    basemap_attribution_on_map: false    # draw the attribution on the map
+    # Map extent = extent of the municipal outline widened by these shares of its
+    # width / height: [left, right, bottom, top]
+    map_margins: [0.015, 0.015, 0.03, 0.07]
+    basemap_pad: 0.015                   # tiles cover the map extent + 1.5%
+    # Split disks: radius of the largest half-disk in EPSG:3857 metres; half-disk
+    # radius proportional to sqrt(count), i.e. area proportional to count
+    disk_max_radius_m: 5200
+    disk_key_counts: [5000, 15000, 30000]   # size key
+    # Label placement around each disk (default below) and display labels (layout)
+    label_positions: {grotao_de_costa_barros: left, morro_da_guaiba: above, faz_quem_quer: right, catumbi: right, jacarezinho: below, barao: left}
+    map_labels: {grotao_de_costa_barros: "Grotão"}
+    map_width_in: 6.0
+    # --- Fig. 1a Rocinha input map and Fig. 1c indicator maps ---
+    example_site: rocinha                # example site of Fig. 1a,c
+    # Map window, EPSG:31983 [xmin, ymin, xmax, ymax]; squared and widened by
+    # example_window_pad; buildings selected by centroid. Layout.
+    example_window: [680290, 7455500, 680980, 7456150]
+    example_window_pad: 0.04
+    # Fig. 1c: one representative indicator per dimension, in the order
+    # dimension, shape, spatial distribution, configuration, connectivity
+    feature_maps: [area, elongation, mean_interbuilding_distance, num_neighbors, avg_weighted_dist]
+    colour_percentiles: [2, 98]          # colour scale clipped to these percentiles. Layout.
+    map_size_in: [3.0, 3.3]              # layout
+    # Fig. 1a input map: official 2013 boundary drawn dashed (true) or solid;
+    # the Fig. 1c indicator maps draw it solid.
+    input_boundary_dashed: true
+    # --- Element-map export (layout) ---
+    font_size_pt: 8
+    # true: all text converted to vector outlines (no font in the PDF/SVG);
+    # false: editable text
+    text_as_outlines: true
+
+# -----------------------------------------------------------------------------
+# main/02_classification (per-site XGBoost, Tree SHAP, SI Table S3, out-of-fold
+# boundary errors, Main Fig. 2). Model settings are in 'model_main',
+# 'model_cv', 'oof', 'shap' and 'boundary_errors' above.
+# -----------------------------------------------------------------------------
+main_02_classification:
+  figure2:
+    # Fig. 2a: two representative favelas
+    panel_a_sites: [faz_quem_quer, morro_da_guaiba]
+    # Fig. 2a: test_only = test buildings coloured by classification outcome,
+    # training buildings neutral grey; all_buildings = every building coloured
+    # by its prediction.
+    panel_a_buildings: test_only
+    short_names: {grotao_de_costa_barros: "Grotão"}   # Fig. 2b axis label
+    panel_b_x_min: 0.85            # layout; lowered automatically when an accuracy is below it
+    panel_c_y_max_pct: 65          # layout; raised automatically when a band exceeds it
+    width_mm: 183                  # Nature double column
+    height_mm: 170                 # layout
+    # Text and panel-letter sizes at 183 mm width (layout)
+    font_size_pt: 11.5
+    panel_label_size_pt: 17.3
+    # Fig. 2a error colours. by_class: orange = favela building predicted formal,
+    # red = formal-settlement building predicted favela (as SI Fig. S2);
+    # single: orange for both.
+    misclassified_colours: by_class
+
+# -----------------------------------------------------------------------------
+# appendix/S12_spatial_cv: spatial cross-validation (Methods 4.5; SI S12;
+# SI Tables S10-S16; SI Figs S19-S21; ED Figs 3-4). Shared settings are in
+# 'model_cv' and 'spatial_cv' above; the settings below are those of this
+# folder only.
+# -----------------------------------------------------------------------------
+appendix_S12_spatial_cv:
+  # Attribute fields of Limite Favelas 2013 that identify a polygon (held-out
+  # favela components, SI S12; Supplementary Data 2 polygon codes)
+  polygon_code_field: cod_favela
+  polygon_name_field: nome
+  # SI Fig. S21 diamonds: one stratified random 80/20 split per site,
+  # refitted in this pipeline.
+  component_figure_reference: {test_size: 0.2, stratify: true, random_state: 42}
+  # Buffers at which the per-building out-of-fold predictions of the first grid
+  # placement of every square-block design are kept (SI Fig. S20; SI Table S15).
+  prediction_buffers_m: [0, 200, 400]
+  # Out-of-fold Tree-SHAP runs of the ranking analysis (SI S12 'Stability of
+  # the attributions'; SI Table S16; ED Figs 3-4). Seeds: spatial_cv.ranking.
+  ranking:
+    # SI Table S16: first grid placement of every block size with no buffer,
+    # 200 m and (stress tests) 400 m
+    first_placement_blocks_m: [100, 250, 500, 1000]
+    first_placement_buffers_m: [0, 200, 400]
+    # Designs [block_m, buffer_m] run with three grid placements (SI Table S16;
+    # ED Fig. 3); all other designs use the first placement.
+    three_placement_designs: [[250, 0], [250, 200], [500, 200], [1000, 200]]
+    # SI S12 / SI Table S16: hexagons of the area of a 250 m square, k-means units
+    # of about 250 m and 250 m blocks in ten folds, 200 m buffer, one placement
+    alternative_unit_designs: [hex250, kmm250, sq250_K10]
+    alternative_unit_buffer_m: 200
+    # SI S12: size-matched control of 250 m blocks with a 200 m buffer
+    control_design: {block_m: 250, buffer_m: 200}
+    # Minimum number of explained buildings for a ranking.
+    min_covered_buildings: 10
+    # SI S12 'Stability of the attributions': direction survival of the three
+    # and the five leading indicators
+    direction_top_k: [3, 5]
+    # Minimum number of buildings for a Spearman sign
+    direction_min_buildings: 3
+  # SI Fig. S21: per-site markers, mean over scored folds; bars, +/-1 s.d.
+  # over folds; dots, individual folds (with horizontal jitter; layout).
+  figure_S21: {fold_dots: true, dot_jitter: 0.03, dot_seed: 7}
+  # ED Fig. 3a design schematic (Catumbi): folds and held-out component shown
+  # (layout).
+  ed3_schematic: {site: catumbi, fold_250: 4, fold_1000: 1, component_group: 13}
+
+# -----------------------------------------------------------------------------
+# appendix/S06_attribution_analyses: Extended Data Fig. 2, SI Figs S6-S9 and SI
+# Section S6.1. Shared settings are in 'importance', 'dependence',
+# 'boundary_profiles' and 'boundary_direction' above. SI Table S5 and the x0 / w
+# values of SI S6 are produced by main/04_boundary_profiles (one computation).
+# -----------------------------------------------------------------------------
+appendix_S06_attribution_analyses:
+  # Panel order of ED Fig. 2 and site colours of SI Fig. S8 (layout only)
+  site_order: [rocinha, morro_da_guaiba, barao, jacarezinho, faz_quem_quer, catumbi, palmeras, fazena_coqueiro, nova_cidade, grotao_de_costa_barros]
+  # Abbreviated site names in the SI Fig. S8 legend and the SI Fig. S9 rows
+  short_site_names: {grotao_de_costa_barros: "Grotão de C.B."}
+  # ED Fig. 2: indicators share a common order, the mean over the sites of the
+  # per-site importance
+  importance_common_order: mean_over_sites
+  # SI Fig. S6: favela classification probability across the 2013 boundary
+  probability:
+    # Share of buildings whose predicted class (main per-site model) is favela:
+    # all = every building of the site, training and test; test = held-out test
+    # buildings of the main split only.
+    buildings: all
+    min_buildings_per_bin: 25     # minimum buildings per bin
+    band: min_max                 # SI Fig. S6: per-site range (band)
+  # SI Fig. S7: values beyond the 1st/99th percentile enter the end bins of the
+  # trends.
+  dependence_tails_in_end_bins: true
+  # SI S6.1 and SI Fig. S9 (thresholds and sweep lists in 'boundary_direction' above)
+  direction:
+    # SI S6.1: ddof of the standard deviation of the per-site net skews
+    net_skew_sd_ddof: 1
+    # Sensitivity sweep (SI S6.1): grid = every combination of the two lists;
+    # one_at_a_time = each list with the other setting at its primary value.
+    sweep_design: grid
+    # Site with fewer than boundary_direction.min_buildings_per_group buildings
+    # in a group: kept and flagged (flag) or left out of that design point
+    # (exclude).
+    min_group_rule: flag
+    figure_xlim: 62               # SI Fig. S9 x axis from -62 to +62 % (layout)
+
+# -----------------------------------------------------------------------------
+# appendix/S07_pca: SI Section S7 and SI Fig. S10 (map of PC1 thresholded per
+# site). The PCA and the per-site Youden threshold are in 'pca' above; PC1 is
+# read from main/05_attribution_plane (products.attribution_pca_scores).
+# -----------------------------------------------------------------------------
+appendix_S07_pca:
+  # SI Fig. S10: representative study sites, in panel order
+  map_sites: [fazena_coqueiro, faz_quem_quer, morro_da_guaiba, nova_cidade, barao, catumbi, rocinha]
+  # SI S7: buildings above their site's threshold are favela-like. ">" =
+  # strictly above (as in main/05_attribution_plane); ">=" also counts the
+  # building at the threshold.
+  favela_like_rule: ">"
+  # SI Fig. S10 colours
+  map_colours: {favela_like: "#FF7F0E", other: "#8B959A", boundary: "#000000"}
+  boundary_linewidth: 0.6         # layout
+  map_pad_fraction: 0.02          # layout: map extent = building extent + 2% of its larger side
+  grid_columns: 4                 # layout of the panel grid
+  raster_dpi: 600                 # building layers rasterised at this resolution; outlines stay vector
+
+# -----------------------------------------------------------------------------
+# appendix/S08_transfer: cross-site transfer (Methods 4.11; SI S8; SI Figs
+# S11-S12). Shared settings are in 'transfer' above; the settings below are
+# those of this folder.
+# -----------------------------------------------------------------------------
+appendix_S08_transfer:
+  # Favela predicted when P(favela) >= this value, as for the within-site
+  # results (SI Table S3; favela_xai.model.SiteModel.predict).
+  prediction_threshold: 0.5
+  bootstrap_percentiles: [2.5, 97.5]   # SI S8 / SI Fig. S11: site-bootstrap 95% confidence interval
+  chance_level: 0.5                # SI S8 chance level; SI Fig. S12a dotted line
+  significance_level: 0.05         # SI Fig. S12: orange bars, p < 0.05 (uncorrected); also the q < 0.05 flag
+
+# -----------------------------------------------------------------------------
+# appendix/S09_block_complexity_k: block-complexity index k (Methods 4.9;
+# SI S9; SI Tables S6-S7; SI Fig. S13). Shared settings are in
+# 'block_complexity' above; the settings below are those of this folder.
+# -----------------------------------------------------------------------------
+appendix_S09_block_complexity_k:
+  # OSM download settings (osmnx)
+  osm_network_type: all
+  osm_simplify: false
+  osm_retain_all: true
+  # Download date of the OpenStreetMap street extracts analysed in the paper
+  stored_streets_download_date: "2026-05-08"
+  # Buildings with invalid or empty geometries are left out before k is
+  # computed.
+  drop_invalid_geometries: true
+  # momepy.Tessellation parameters
+  tessellation_shrink: 0.4
+  tessellation_segment: 0.5
+  # SI Table S6 'Feature-Basic' PCA seed
+  feature_basic_pca_seed: 42
+  # Per-site accuracy / AUC rounded to 3 decimals before averaging; s.d.
+  # across sites (SI Table S6) and across folds (SI Table S7) with ddof 0.
+  round_site_metrics: 3
+  summary_sd_ddof: 0
+  # Row order of the pooled data set (sites stacked in this order). Only
+  # affects fold assignment (SI Table S7).
+  pooled_site_order: [rocinha, jacarezinho, nova_cidade, fazena_coqueiro, catumbi, grotao_de_costa_barros, morro_da_guaiba, barao, faz_quem_quer, palmeras]
+  # Per-site distribution statistics need at least this many buildings per class
+  distribution_min_group: 5
+  # SI Fig. S13 layout
+  figure:
+    width_in: 10.5
+    axes_size_in: [4.1373, 3.4395]
+    bottom_in: 0.5778
+    top_margin_in: 0.3283
+    left_a_in: 0.5867
+    left_b_in: 5.8896
+    favela_colour: "#3F83A2"
+    formal_colour: "#9aa0a6"
+    short_names: {grotao_de_costa_barros: "Grotão"}
+
+# appendix/S10_boundaries_2013_2019 (Methods 4.12; SI S10; SI Table S8) has no
+# settings of its own: the overlay rule is in 'boundary_overlay' above, the
+# row order in display_orders.table_S8.
+
+# -----------------------------------------------------------------------------
+# appendix/S13_boundary_robustness: robustness of the boundary analyses (SI S13;
+# ED Fig. 5; SI Fig. S22; SI Table S17). Shared settings are in
+# 'boundary_robustness' and 'boundary_profiles' above; the settings below are
+# those of this folder.
+# -----------------------------------------------------------------------------
+appendix_S13_boundary_robustness:
+  # The five leading indicators of SI S13, SI Table S17, SI Fig. S22 and ED
+  # Fig. 5e: the five largest |dS| of SI Table S5 (02_straddler_exclusions.py
+  # prints a note if a run gives a different set).
+  leading_indicators: [mean_interbuilding_distance, adjacency, perimeter_wall, squareness, avg_weighted_dist]
+  # ED Fig. 5a,b: mean interbuilding distance and adjacency
+  shifted_boundary_panels: [mean_interbuilding_distance, adjacency]
+  # Within-class gradient: minimum buildings per distance band and site
+  gradient_min_buildings_per_band: 20
+  # Order of the sites in the site-bootstrap draws of the raw-profile intervals
+  # (SI Fig. S22; SI S13 raw dS intervals).
+  raw_bootstrap_site_order: [rocinha, morro_da_guaiba, barao, jacarezinho, faz_quem_quer, catumbi, palmeras, fazena_coqueiro, nova_cidade, grotao_de_costa_barros]
+  # The eight compass directions of the rigid polygon shifts (SI S13; SI Table
+  # S17), degrees counter-clockwise from east
+  shift_directions_deg: {"N": 90, "NE": 45, "E": 0, "SE": -45, "S": -90, "SW": -135, "W": 180, "NW": 135}
+  # Per-polygon random shifts: run r at distance index i and site index j uses
+  # default_rng(boundary_robustness.per_polygon_seed_base + distance*i + run*r + site*j).
+  per_polygon_seed_steps: {distance: 100, run: 11, site: 1000}
+  # Final width of ED Fig. 5 and SI Fig. S22 (Nature double column); the
+  # figures are drawn at a fixed matplotlib size and scaled to it.
+  figure_width_mm: 183
+
+# -----------------------------------------------------------------------------
+# appendix/S14_label_free: label-free clustering (Methods 4.13; SI S14;
+# SI Table S18; SI Fig. S23). Shared settings are in 'label_free' above; the
+# settings below are those of this folder.
+# -----------------------------------------------------------------------------
+appendix_S14_label_free:
+  # Continuous two-cluster score for 'Separation' and 'Gradient' (SI S14):
+  # k-means with two clusters
+  score_clusters: 2
+  # Supervised reference (SI S14; SI Table S18: five-fold cross-validation of
+  # the pipeline of SI S12): rows of this design in products.spatial_cv_folds
+  # (per-site balanced accuracy, SI Fig. S23b) ...
+  supervised_folds_design: random_skf5
+  # ... and the out-of-fold favela probability in products.oof_predictions
+  # (AUC and boundary profile); the first column name found is used.
+  oof_probability_columns: [prob, oof_prob, prob_favela, p_favela]
+  # Row names of SI Table S18
+  weighting_names:
+    all_equal: "All indicators equal"
+    dimensions_balanced: "Dimensions balanced"
+    one_component_per_dimension: "One component per dimension"
+  # Short site names in SI Fig. S23b (layout)
+  short_site_names: {grotao_de_costa_barros: "Grotão"}
+
+# -----------------------------------------------------------------------------
+# appendix/S02_site_selection: site selection and site context (Methods 4.1;
+# SI S2.1; SI Table S1; SI Fig. S1). Shared settings are in 'site_context'
+# above; the slope thresholds of the setting column in 'terrain'. The settings
+# below are those of this folder.
+# -----------------------------------------------------------------------------
+appendix_S02_site_selection:
+  # Data.Rio administrative-boundaries service and the layer ids of the three
+  # GeoJSON exports in paths.raw.municipality / planning_areas / bairros
+  # (appendix/S02_site_selection/01_context_layers.py --download).
+  context_service_url: https://pgeo3.rio.rj.gov.br/arcgis/rest/services/Cartografia/Limites_administrativos/FeatureServer
+  context_layer_ids: {municipality: 0, planning_areas: 1, bairros: 4}
+  # Attribute of the planning-area code (1-5) and the planning-area names of
+  # SI Table S1
+  planning_area_code_field: codap
+  planning_area_names: {"1": "AP1 Centro", "2": "AP2 Zona Sul", "3": "AP3 Zona Norte", "4": "AP4 Zona Oeste", "5": "AP5 Zona Oeste"}
+  # Attribute holding the bairro name; the first name present in the layer is used
+  bairro_name_fields: [nome, NOME, NM_BAIRRO]
+  # 2013 footprint layer: attribute of the footprint type (SI Fig. S1e counts all
+  # types), chunk size of the city-wide read (memory only) and the two building
+  # types of a secondary density column (CSV only)
+  footprint_tipo_field: Tipo
+  footprint_read_chunk: 500000
+  footprint_building_tipos: ["A101 - EDIFICACAO", "A102 - EDIFICACAO_FAVELA"]
+  # Attributes of Limite Favelas 2013 that identify a polygon (as appendix_S12_spatial_cv)
+  polygon_code_field: cod_favela
+  polygon_name_field: nome
+  # SI S2.1 distance to the city centre weighted by polygon area:
+  # median | mean.
+  area_weighted_statistic: median
+  # SI Table S1 (CSV only): share of a site's buildings inside the convex hull of
+  # its favela polygons, with this tolerance.
+  polygon_hull_tolerance_m: 1.0
+  # SI Table S1 mean slope from the 5 m LiDAR terrain model (SI S11) of the
+  # per-site building set of the main analysis: the per-building terrain
+  # written by appendix/S11_terrain step 01 (relative to the outputs root)
+  terrain_buildings: appendix/S11_terrain/{site}_buildings_with_terrain.gpkg
+
+# -----------------------------------------------------------------------------
+# appendix/S05_boundary_errors: misclassification at favela boundaries (SI S5;
+# SI Figs S2-S5; SI Table S4; Extended Data Fig. 1). The out-of-fold
+# predictions and error-rate tables are computed by main/02_classification
+# (settings 'oof', 'model_cv' and 'boundary_errors' above); these are the
+# settings of the figures and tables laid out here.
+# -----------------------------------------------------------------------------
+appendix_S05_boundary_errors:
+  # Tables of main/02_classification read here (outputs/main/02_classification/)
+  inputs_from_main_02: {bins: boundary_error_bins.csv, bands: boundary_error_bands.csv}
+  short_names: {grotao_de_costa_barros: "Grotão de C.B."}   # SI Figs S3-S5 (layout)
+  spatial_mapping_figure:
+    # SI Fig. S2: test_only = test buildings coloured by classification
+    # outcome, training buildings grey; all_buildings = predictions for every
+    # building.
+    buildings: test_only
+    # SI Fig. S2 colours: blue, true favela (correctly classified); green, true
+    # non-favela (correctly classified); orange and red, misclassified
+    colours: {TP: "#2E86AB", FN: "#F39C12", TN: "#27AE60", FP: "#E74C3C"}
+    # Panel arrangement (layout only); a key repeated in a row spans columns
+    panel_rows:
+      - [faz_quem_quer, rocinha, rocinha, morro_da_guaiba]
+      - [barao, palmeras, grotao_de_costa_barros, nova_cidade]
+      - [catumbi, fazena_coqueiro, fazena_coqueiro, jacarezinho]
+    size_in: [7.2, 6.4]            # 183 mm wide (layout)
+    polygon_lw: 0.5                # 2013 polygon outline in the assembled figure (layout)
+    polygon_lw_single: 1.0         # the same in the single-site maps (layout)
+    raster_dpi: 600                # building polygons are rasterised inside the vector PDF
+    legend: true
+  failure_drivers_figure:
+    # SI Fig. S3 (SI S5): Tree-SHAP attributions of the false positives
+    # (non-favela buildings assigned to the favela class) over
+    # all_buildings | test_split.
+    population: all_buildings
+    top_per_site: 3                # SI Fig. S3: features among the top 3 drivers in any site
+    # Columns ordered by per-site test accuracy, high to low (as Fig. 2b);
+    # fixed_order is used when SI Table S3 is not available
+    site_order: by_test_accuracy
+    fixed_order: [rocinha, morro_da_guaiba, barao, jacarezinho, faz_quem_quer, catumbi, palmeras, fazena_coqueiro, nova_cidade, grotao_de_costa_barros]
+    size_in: [7.0, 4.2]
+  case_studies:
+    # SI Fig. S5: the four leading morphological features
+    drivers: [mean_interbuilding_distance, adjacency, perimeter_wall, squareness]
+    # SI Figs S4-S5: the four clusters; centre (EPSG:31983) and half-width of
+    # each square window
+    windows:
+      - {letter: a, title: "Rocinha · boundary cluster", site: rocinha, x: 680475, y: 7456125, half_width_m: 190}
+      - {letter: b, title: "Rocinha · within-site cluster", site: rocinha, x: 679783, y: 7456979, half_width_m: 320}
+      - {letter: c, title: "Grotão de C.B. · perimeter wall", site: grotao_de_costa_barros, x: 666525, y: 7474875, half_width_m: 200}
+      - {letter: d, title: "Grotão de C.B. · false negatives", site: grotao_de_costa_barros, x: 666825, y: 7474575, half_width_m: 190}

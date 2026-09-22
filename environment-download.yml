@@ -1,0 +1,22 @@
+# Download environment for OpenStreetMap streets (osmnx 2.1, Main Methods
+# 'Re-implementation of the block-complexity index k'; SI S9).
+#
+# osmnx 2.1 requires Python >= 3.11, so it is kept apart from the analysis
+# environment (environment.yml). Only the street
+# download runs here; it writes one GeoPackage per site to
+# data/raw/osm_streets/, which the analysis environment then reads.
+#
+#   conda env create -f environment-download.yml
+#   conda activate favela-xai-download
+name: favela-xai-download
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - osmnx=2.1
+  - geopandas>=1.0.1
+  - pyogrio
+  - pyyaml
+  - pip
+  - pip:
+      - -e .

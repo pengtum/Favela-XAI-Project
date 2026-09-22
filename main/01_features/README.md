@@ -1,0 +1,72 @@
+# main/01_features: footprints, tessellation and the 25 morphological indicators
+
+Builds the per-building table of every site from the 2013 building footprints
+of Rio de Janeiro: footprints are cleaned, cut to the ten site windows,
+labelled favela or formal settlement with the official 2013 favela polygons,
+tessellated and described by 25 morphological indicators. The folder also
+computes the signed distance of every building to the 2013 favela boundary,
+writes SI Table S2 and draws the element maps of Fig. 1.
+
+## Manuscript items
+
+| Item | Script |
+|---|---|
+| Methods 4.1: ten sites, 188,735 buildings, 82,015 within official favela boundaries | 01, 04 |
+| Methods 4.2, SI Section S1: footprint pre-processing; <0.1% of geometries per site discarded at the tessellation stage | 01, 02, 04 |
+| Methods 4.3, SI Section S3: 25 indicators in five dimensions (dimension 3, shape 13, spatial distribution 4, configuration 3, connectivity 2), computed with momepy | 03 |
+| SI Table S2: indicator names, figure labels and dimensions | 06 |
+| Methods 4.7-4.8: signed distance to the official 2013 favela boundary (input of all boundary analyses) | 05 |
+| Fig. 1a: study-area map with per-class building counts; Rocinha input map | 04, 07, 08, 09 |
+| Fig. 1c: one representative indicator per dimension mapped across Rocinha | 09 |
+
+Fig. 1 is assembled by hand from these element maps; panel b (pipeline
+schematic) is artwork.
+
+## Run order
+
+From the repository root, in the environment of `environment.yml`:
+
+```bash
+python main/01_features/01_preprocess_footprints.py   # clean the footprints, cut the windows, label
+python main/01_features/02_tessellation.py            # morphological tessellation and exclusions
+python main/01_features/03_indicators.py              # the 25 indicators -> <site>_buildings_features.gpkg
+python main/01_features/04_site_summary.py            # building counts and pre-processing report
+python main/01_features/05_signed_distance.py         # signed distance to the 2013 boundary
+python main/01_features/06_table_S2.py                # SI Table S2 and the indicator registry
+python main/01_features/07_fig1_basemap.py            # optional, needs internet: basemap tiles for Fig. 1a
+python main/01_features/08_figure1_study_area.py      # Fig. 1a study-area map
+python main/01_features/09_figure1_example_maps.py    # Fig. 1a input map and Fig. 1c indicator maps
+```
+
+Scripts 01-03 accept `--sites <key> ...`; 04 and 05 need all sites. 06 needs
+no input data. Without the tile cache of 07, 08 draws the municipal outline
+only. `figure1_common.py` holds helpers of 07-09.
+
+## Inputs
+
+- Building footprints 2013 (*Edificações 2013*, Data.Rio): `paths.raw.buildings_2013`
+- Official favela polygons 2013 (*Limite Favelas 2013*, Data.Rio): `paths.raw.favelas_2013`
+- Municipal boundary of Rio de Janeiro (Fig. 1a only, Data.Rio): `paths.raw.municipality`
+- Site windows and settings: `config.yaml`, sections `sites`, `preprocessing`,
+  `tessellation`, `indicators`, `labels`, `signed_distance`, `main_01_features`
+
+Data are not distributed with the code; `data/README.md` lists the sources.
+
+## Outputs (`outputs/main/01_features/`)
+
+| File | Content | Script |
+|---|---|---|
+| `<site>_footprints_clean.gpkg` | cleaned footprints of the window with `label` (`favela` / `not-favela`) | 01 |
+| `<site>_buildings_tessellated.gpkg`, `<site>_tessellation.gpkg`, `<site>_excluded_buildings.gpkg` | kept buildings, their cells (joined by `uID`) and excluded buildings with the reason | 02 |
+| `<site>_buildings_features.gpkg` | per-site building table: `uID`, `cod_unico`, `Tipo`, `label`, the 25 indicators, geometry (EPSG:31983); input of every later folder | 03 |
+| `preprocessing_report.csv`, `site_counts.csv`, `indicator_missing_values.csv` | counts per cleaning and exclusion step, per-class building counts and positions, missing indicator values | 04 |
+| `signed_distance.parquet` | site, `uID`, `is_favela`, `signed_dist` (m, negative on the favela side) | 05 |
+| `table_S2_indicators.tex`, `indicator_registry.csv` | SI Table S2 and the full indicator registry | 06 |
+| `fig1_map_sites.*`, `fig1_map_input.*`, `fig1_map_feat_<indicator>.*` | Fig. 1 element maps (PDF and SVG) | 08, 09 |
+
+## Settings with alternatives
+
+- `indicators.adjacency_contiguity` (tessellation | buildings): queen contiguity
+  of the tessellation cells or of the footprints, used by the building-adjacency indicator.
+- `signed_distance.dissolve_polygons` (false | true): distance to the edges of
+  the individual 2013 polygons or to the boundary of their dissolved union.

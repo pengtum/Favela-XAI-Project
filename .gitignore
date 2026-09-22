@@ -1,0 +1,19 @@
+# Generated results (recreated by the scripts)
+outputs/
+
+# Raw data are downloaded by the user (see data/README.md); keep only the layout
+data/raw/*
+!data/raw/.gitkeep
+
+# Holding folder of files removed during the September 2026 clean-up (delete after checking)
+_removed_*/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# OS / editors
+.DS_Store
+.ipynb_checkpoints/

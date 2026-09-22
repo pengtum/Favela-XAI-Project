@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "favela-xai"
+version = "1.0.0"
+description = "Shared code for 'Building-scale morphological signatures of informal settlements'"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.10"
+authors = [{name = "Peng Luo"}]
+# Versions are pinned in environment.yml / requirements.txt.
+dependencies = [
+    "geopandas",
+    "shapely>=2.1",
+    "pyyaml",
+    "numpy",
+    "pandas",
+    "scipy",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
