@@ -4,7 +4,6 @@ Code for:
 
 > **Building-scale morphological signatures of informal settlements**
 > Peng Luo, Fábio Duarte, Luiz Carlos Teixeira Coelho, Carlo Ratti
-> (*Nature Cities*, under review)
 
 ## Overview
 
