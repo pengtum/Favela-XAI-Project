@@ -19,7 +19,7 @@ trees, seed 432, training-median imputation) and explained with out-of-fold Tree
 | Supplementary Table S16 (ranking stability) | 11 |
 | Extended Data Fig. 3 (rankings under spatial cross-validation) | 11, 13 (panel a: `ed3_schematic.py`) |
 | Extended Data Fig. 4 (per-site importance shares) | 11, 14 |
-| Supplementary Data 1 and 2 (per-fold record) | 15 |
+| Per-fold record summarised in SI Table S14 | 15 |
 
 Main results (both scoring criteria, site-bootstrap 95% intervals):
 
@@ -48,7 +48,7 @@ python appendix/S12_spatial_cv/11_ranking_stability.py    # Supplementary Table 
 python appendix/S12_spatial_cv/12_direction_survival.py   # direction of the attributions
 python appendix/S12_spatial_cv/13_figure_ED3.py           # Extended Data Fig. 3
 python appendix/S12_spatial_cv/14_figure_ED4.py           # Extended Data Fig. 4
-python appendix/S12_spatial_cv/15_supplementary_data.py   # Supplementary Data 1 and 2
+python appendix/S12_spatial_cv/15_supplementary_data.py   # per-fold record (two CSV files)
 ```
 
 Steps 03 and 10 fit several thousand models. They write one shard per site and job and skip existing shards, so an interrupted run resumes with the same command, and different `--sites` can run in parallel.
@@ -62,7 +62,7 @@ Inputs: per-site feature tables and signed distances (`main/01_features`), Tree 
 Outputs, under `outputs/appendix/S12_spatial_cv/`:
 
 * `tables/`: LaTeX files of Supplementary Tables S10-S16; `figures/`: PDF (and PNG preview) of Supplementary Figs S19-S21 and Extended Data Figs 3-4;
-* `folds_all.parquet` (fold record), `predictions_oof.parquet`, `supplementary_data/` (Supplementary Data 1 and 2);
+* `folds_all.parquet` (fold record), `predictions_oof.parquet`, `supplementary_data/` (per-fold record);
 * `accuracy/`, `distances/`, `component/`, `ranking/`, `direction/`: plotted values and quoted numbers;
 * intermediate files: `site_tables/`, `component_groups/`, `fold_shards/`, `prediction_shards/`, `shap_fold_sums/`, `shap_buildings/`, `logs/`.
 

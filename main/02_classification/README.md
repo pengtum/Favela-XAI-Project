@@ -60,8 +60,8 @@ python main/02_classification/06_figure2.py              # Fig. 2
 
 ## Settings with alternatives
 
-- `main_02_classification.figure2.panel_a_buildings` (test_only | all_buildings):
-  colour only the held-out test buildings by outcome, or every building by its prediction.
+- `main_02_classification.figure2.panel_a_buildings` (all_buildings | test_only):
+  colour every building by its prediction (default, as published), or only the held-out test buildings.
 - `main_02_classification.figure2.misclassified_colours` (by_class | single):
   separate colours for the two error types, or one colour for both.
 - `model_cv.fit_formal_as_class_1` (true | false): class coding of the

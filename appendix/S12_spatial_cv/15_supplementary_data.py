@@ -1,11 +1,10 @@
-"""Step 15: the per-fold record of the spatial validation (Supplementary Data 1 and 2).
+"""Step 15: the per-fold record of the spatial validation (two CSV files).
 
-Manuscript items: Supplementary Data 1 and 2, the per-fold record (accuracy, AUC,
-favela-class F1, class prevalence, training and test sizes) referred to in the SI
-Table S14 caption.
+Manuscript items: the per-fold record (accuracy, AUC, favela-class F1, class
+prevalence, training and test sizes) summarised in SI Table S14.
 
-Supplementary Data 1: every fold of the square-block, alternative-unit, random and
-pooled leave-site-out designs (8,020 rows with the ten sites). Supplementary Data 2:
+File 1: every fold of the square-block, alternative-unit, random and
+pooled leave-site-out designs (8,020 rows with the ten sites). File 2:
 every fold of the held-out favela component (116 rows). Both carry two scoring columns
 (SI S12 'Scoring'):
   'Fold used'              the fold was fitted and its training set holds at least 50

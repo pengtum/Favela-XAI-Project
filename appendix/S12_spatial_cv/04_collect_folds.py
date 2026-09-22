@@ -1,7 +1,7 @@
 """Step 4: collect the fold shards of step 3 into the fold record and the prediction table.
 
 Manuscript items: the fold record behind every accuracy value of SI Section S12
-(SI Tables S10-S15, SI Figs S19-S21) and Supplementary Data 1-2; the distance
+(SI Tables S10-S15, SI Figs S19-S21) and the per-fold record (step 15); the distance
 of each held-out site to the nearest training site quoted in the SI Table S10
 caption ("held-out sites lie 3.2-12.0 km from the nearest training site").
 

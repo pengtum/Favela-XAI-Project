@@ -1,7 +1,8 @@
 """Step 6: Fig. 2 (favela-detection performance), panels a, b and c.
 
 Manuscript items
-  * Fig. 2a: building-level classification outcome on the held-out test set
+  * Fig. 2a: building-level classification outcome of every building (training and
+    held-out test)
     for two representative favelas (Faz Quem Quer, Morro da Guaiba), with the
     official 2013 favela boundary.
   * Fig. 2b: per-site held-out test accuracy, ordered high to low, and the
@@ -15,8 +16,8 @@ Manuscript items
   typesetting of the manuscript figure is done by hand.
 
 Panel a (config main_02_classification.figure2)
-  panel_a_buildings (test_only | all_buildings): held-out test buildings coloured by outcome
-  and training buildings in neutral grey, or every building coloured by its prediction.
+  panel_a_buildings (all_buildings | test_only): every building coloured by its prediction
+  (default, as published), or held-out test buildings coloured and training buildings grey.
   misclassified_colours (by_class | single): orange for favela buildings predicted formal and
   red for formal-settlement buildings predicted favela, or orange for both.
   Outline: edges of the 2013 favela polygons, clipped to the site extent.

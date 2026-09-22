@@ -665,10 +665,10 @@ main_02_classification:
   figure2:
     # Fig. 2a: two representative favelas
     panel_a_sites: [faz_quem_quer, morro_da_guaiba]
-    # Fig. 2a: test_only = test buildings coloured by classification outcome,
-    # training buildings neutral grey; all_buildings = every building coloured
-    # by its prediction.
-    panel_a_buildings: test_only
+    # Fig. 2a: all_buildings = every building (training and held-out test)
+    # coloured by its prediction, as in the published panel; test_only = test
+    # buildings coloured, training buildings neutral grey.
+    panel_a_buildings: all_buildings
     short_names: {grotao_de_costa_barros: "Grotão"}   # Fig. 2b axis label
     panel_b_x_min: 0.85            # layout; lowered automatically when an accuracy is below it
     panel_c_y_max_pct: 65          # layout; raised automatically when a band exceeds it
@@ -690,7 +690,7 @@ main_02_classification:
 # -----------------------------------------------------------------------------
 appendix_S12_spatial_cv:
   # Attribute fields of Limite Favelas 2013 that identify a polygon (held-out
-  # favela components, SI S12; Supplementary Data 2 polygon codes)
+  # favela components, SI S12; polygon codes of the per-fold record)
   polygon_code_field: cod_favela
   polygon_name_field: nome
   # SI Fig. S21 diamonds: one stratified random 80/20 split per site,
@@ -946,10 +946,10 @@ appendix_S05_boundary_errors:
   inputs_from_main_02: {bins: boundary_error_bins.csv, bands: boundary_error_bands.csv}
   short_names: {grotao_de_costa_barros: "Grotão de C.B."}   # SI Figs S3-S5 (layout)
   spatial_mapping_figure:
-    # SI Fig. S2: test_only = test buildings coloured by classification
-    # outcome, training buildings grey; all_buildings = predictions for every
-    # building.
-    buildings: test_only
+    # SI Fig. S2: all_buildings = every building (training and held-out test)
+    # coloured by its prediction, as in the published figure; test_only = test
+    # buildings coloured, training buildings grey.
+    buildings: all_buildings
     # SI Fig. S2 colours: blue, true favela (correctly classified); green, true
     # non-favela (correctly classified); orange and red, misclassified
     colours: {TP: "#2E86AB", FN: "#F39C12", TN: "#27AE60", FP: "#E74C3C"}

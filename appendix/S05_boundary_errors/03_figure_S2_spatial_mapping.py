@@ -9,7 +9,8 @@ What is drawn
 * ``appendix_S05_boundary_errors.spatial_mapping_figure.buildings``:
   ``test_only``: held-out test buildings of the stratified 80/20 split coloured
   by outcome, training buildings in neutral grey;
-  ``all_buildings``: every building coloured by the full-data prediction.
+  ``all_buildings`` (default, as published): every building coloured by the prediction
+  of its site model (training and held-out test buildings).
 * Outcome colours (``spatial_mapping_figure.colours``): favela correct (blue),
   formal settlement correct (green), favela misclassified (false negative,
   orange), formal settlement misclassified (false positive, red).

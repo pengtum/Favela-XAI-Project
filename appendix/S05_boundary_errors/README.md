@@ -54,7 +54,7 @@ The scripts are independent of each other; `s05_common.py` holds shared helpers.
 
 - Bins and bands (top-level section `boundary_errors`): 6 m bins on ±90 m with open end bins; bands < 6, 6-30, 30-90 and ≥ 90 m; Wilson 95% interval; site bootstrap with 2,000 resamples.
 - False positive: formal building classified favela; false negative: favela building classified formal (main per-site classifier, Methods 4.4).
-- `spatial_mapping_figure.buildings` (test_only | all_buildings): buildings coloured by outcome in Fig. S2 (held-out test buildings, training buildings grey | every building, full-data prediction).
+- `spatial_mapping_figure.buildings` (test_only | all_buildings): buildings coloured by outcome in Fig. S2 (every building, as published | held-out test buildings only, training buildings grey).
 - `failure_drivers_figure.population` (all_buildings | test_split): buildings from which the false positives of Fig. S3 are taken.
 - `failure_drivers_figure.top_per_site`: features drawn in Fig. S3 are the union of each site's largest mean false-positive SHAP values; the dominant driver is the largest.
 - `failure_drivers_figure.site_order` (by_test_accuracy | fixed): column order of Fig. S3.
