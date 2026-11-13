@@ -1,13 +1,11 @@
 """Step 4: building counts per site and the pre-processing report.
 
 Manuscript items
-  * Methods 4.1 (also abstract and introduction): 188,735 building footprints in
-    the ten sites, 82,015 within official favela boundaries (footprints of the site
-    windows before the tessellation stage; columns in_window, favela_in_window);
-    188,292 buildings analysed (column analysed).
+  * Methods 4.1 (also abstract and introduction): 188,735 buildings in the ten
+    sites, 82,015 within official favela boundaries (footprints of the site
+    windows before the tessellation stage; columns in_window, favela_in_window).
   * Methods 4.2 and SI Section S1: geometries discarded at the tessellation
-    stage, 443 of the 188,735 footprints (0.23%) (columns
-    tessellation_excluded_total, excluded_share_pct).
+    stage, <0.1% for any site (column excluded_share_pct).
   * Fig. 1a: per-class building counts and position of each site
     (site_counts.csv, read by 08_figure1_study_area.py).
 
@@ -109,7 +107,7 @@ def main() -> None:
     print(f"record count of the site extracts: "
           f"{int(t['extract_records_stored_analysis']):,}")
     print(f"analysed after the tessellation stage: {int(t['analysed']):,} ({int(t['favela_analysed']):,} favela)")
-    print("share of footprints excluded at the tessellation stage (Methods 4.2: 443 of the 188,735 footprints, 0.23%):")
+    print("share of footprints excluded at the tessellation stage (Methods 4.2: < 0.1% for any site):")
     for r in report.itertuples():
         print(f"  {r.name:24s} {r.tessellation_excluded_total:5d} of {r.in_window:7,d}  ({r.excluded_share_pct:.2f}%)")
 

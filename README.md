@@ -16,8 +16,8 @@ to the 25 indicators. From these attributions it derives the site-level
 signatures (Fig. 3), the boundary profiles of each indicator (Fig. 4) and the
 within-site attribution plane (Fig. 5). The supplementary analyses (spatial
 cross-validation, boundary robustness, label-free clustering, cross-site
-transfer, block complexity, 2013/2019 boundary overlay, terrain ablation,
-sensitivity to the adjacency ratio) are included as well.
+transfer, block complexity, 2013/2019 boundary overlay, terrain ablation) are
+included as well.
 
 This repository contains code only. The input data are open municipal layers
 (see [Data](#data)).
@@ -39,7 +39,7 @@ Favela-XAI-Project/
 │   ├── 03_site_signatures/   site-level importance and dominant features
 │   ├── 04_boundary_profiles/ boundary profiles and transition metrics
 │   └── 05_attribution_plane/ attribution PCA
-├── appendix/                 one folder per Supplementary section (S2, S5-S15),
+├── appendix/                 one folder per Supplementary section (S2, S5-S14),
 │                             including the Extended Data figures
 └── data/README.md            where to download the raw data
 ```
@@ -47,25 +47,6 @@ Favela-XAI-Project/
 Each folder has a README listing the items it produces and its run order. All
 scripts read `config.yaml` (paths relative to the repository root) and write to
 `outputs/<folder>/`.
-
-## Model protocols
-
-The main analysis and the validation analyses use separate configurations. Do not
-replace one with the other when reproducing the paper.
-
-| Analysis | Classifier | Training and test split |
-|---|---|---|
-| Main analysis (Methods 4.4, Table S3, main Tree-SHAP attributions) | `model_main`: 200 trees, maximum depth 6, learning rate 0.1, model seed 42 | Stratified 80/20, split seed 42 |
-| Block-complexity comparison (SI S9, Table S6) | `model_main`, the same fixed settings | Stratified 80/20 within each site, split seed 42 |
-| Pooled block-complexity comparison (SI S9, Table S7) | `model_main`, the same fixed settings | Stratified five-fold cross-validation, fold seed 42 |
-| Boundary errors and adjacency sensitivity (Methods 4.7, SI S15) | `model_cv`: 100 trees, model seed 432, other hyperparameters at the pinned library defaults | Stratified five-fold cross-validation within each site, fold seed 432 |
-| Spatial validation (Methods 4.5, SI S12) | `model_cv`, the same validation settings | Spatial folds and buffers specified in `spatial_cv`; its random 80/20 reference is unstratified, split seed 432 |
-
-The SI S12 split-refit reference uses `model_cv` on unstratified 80/20 splits with
-split seeds 7, 99 and 2024, and compares the rankings with `model_main`. It includes
-the difference in model configuration as well as resampling. Both model pathways
-report probabilities and Tree-SHAP attributions in the favela direction, even
-where the fitted classifier internally codes the other class as positive.
 
 ## Installation
 
@@ -104,7 +85,6 @@ From the repository root, in the `favela-xai` environment:
 | 6 | `appendix/S11_terrain` | the terrain model |
 | 7 | `appendix/S02_site_selection` | main/01 (and S11 for the slope columns of Table S1) |
 | 8 | `appendix/S12_spatial_cv`, `S13_boundary_robustness`, `S14_label_free` | main/02, main/04 |
-| 9 | `appendix/S15_adjacency_sensitivity` | main/01 (tessellation, indicators, signed distance) |
 
 Scripts are numbered in run order within each folder; the folder READMEs note the
 few cross-folder dependencies (e.g. `main/05_attribution_plane/03` uses SI S9 step 03).
@@ -166,14 +146,6 @@ few cross-folder dependencies (e.g. `main/05_attribution_plane/03` uses SI S9 st
 | Tables S10-S16 Spatial cross-validation | `appendix/S12_spatial_cv` | 05, 07, 11 |
 | Table S17 Sensitivity of the sign-change distance | `appendix/S13_boundary_robustness` | 08 |
 | Table S18 Label-free clustering | `appendix/S14_label_free` | 03 |
-| Table S19 Sensitivity to the adjacency ratio (SI Section S15) | `appendix/S15_adjacency_sensitivity` | 01 |
-
-### Supplementary Data
-
-| Item | Folder | Script(s) |
-|---|---|---|
-| Supplementary Data 1 Fold-level record of the spatial validation | `appendix/S12_spatial_cv` | 15 |
-| Supplementary Data 2 Fold-level record of the held-out favela component | `appendix/S12_spatial_cv` | 15 |
 
 ## Citation
 

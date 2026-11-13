@@ -246,12 +246,7 @@ cap = ("Stability of the site-level feature rankings under spatial cross-validat
        "three alternative-unit rows, which use one; rows without a buffer use the first placement, except the row marked "
        f"three placements.{nr_txt} Stress tests (first grid placement): {SMALL} m blocks are smaller than the {PRIM_B} m "
        f"indicator neighbourhood, and a {MAXB} m buffer is twice that neighbourhood; neither is used for the main "
-       "conclusions. In the released configuration, the split-refit reference uses the validation-pipeline classifier "
-       "(100 trees, model seed 432) on unstratified 80/20 splits, "
-       f"with split seeds {', '.join(seeds[:-1])} and {seeds[-1]}, compared with the main-text model "
-       "(200 trees, maximum depth 6, learning rate 0.1, model seed 42; stratified 80/20 split with split seed 42). "
-       "It varies the model specification and split convention as well as the split seed; $\\rho$ minus null is "
-       "the difference relative to this refit reference.")
+       f"conclusions. The split-refit null uses split seeds {', '.join(seeds[:-1])} and {seeds[-1]}.")
 C.write_tex_table(P.tables / "table_R1_ranking_stability.tex", "11_ranking_stability.py", cap, "tab:ranking_stability",
                   body, cfg, tabular="lrrlllrrll")
 

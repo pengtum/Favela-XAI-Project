@@ -2,9 +2,8 @@
 
 Manuscript items
 * SI Table S6: mean and s.d. across the ten sites of test accuracy and AUC for
-  three feature sets (rows): block complexity k alone, PC1 + PC2 of the raw 25
-  indicators (a two-component PCA of the raw 25 indicators) and the raw 25
-  indicators.
+  three feature sets: block complexity k alone, Feature-Basic (two-component
+  PCA of the raw 25 indicators) and Morph-25 (the raw 25 indicators).
 * SI S9 (comparison of classification quality) and the mean per-site AUC of k
   and of the 25 indicators quoted in the Discussion.
 
@@ -16,9 +15,8 @@ Protocol (config.yaml ``block_complexity.persite``, ``model_main``,
 * XGBoost with 200 trees, max depth 6, learning rate 0.1, random seed 42
   (Methods 4.4, favela_xai.model.main_classifier); one model per site and
   feature set; favela = class 1; predicted class = P(favela) > 0.5.
-* PC1 + PC2 of the raw 25 indicators: a two-component PCA (seed 42) of the
-  unstandardised 25 raw indicators, fitted within each site on its whole
-  evaluation subset.
+* Feature-Basic: a two-component PCA (seed 42) of the unstandardised 25 raw
+  indicators, fitted within each site on its whole evaluation subset.
 * Summary: mean and population s.d. (ddof 0) across the sites of the per-site
   values rounded to three decimals.
 
@@ -51,8 +49,8 @@ from k_common import RAW, evaluation_subset, read_k, site_table, tex_number
 # feature set -> (row label of SI Table S6, number of features)
 FEATURE_SETS = {
     "k": ("Block complexity $k$ alone", 1),
-    "feature_basic": ("PC1 + PC2 of the raw 25 indicators", 2),
-    "morph25": ("Raw 25 indicators", 25),
+    "feature_basic": ("Feature-Basic (PC1+PC2 of raw 25)", 2),
+    "morph25": ("Morph-25 (raw 25 indicators)", 25),
 }
 
 
@@ -72,9 +70,7 @@ def table_tex(summary: pd.DataFrame, cfg) -> str:
         r"  single-metric framework as originally",
         r"  proposed\citep{bettencourt2025infrastructure}; the remaining",
         r"  feature sets are derived from the 25 momepy morphological",
-        r"  indicators computed in this study. ``PC1 + PC2'' is a two-component PCA of the 25 raw indicators,"
-        "\n"
-        r"  fitted within each site without standardising them.}",
+        r"  indicators computed in this study.}",
         r"\label{tab:bettencourt_persite}",
         r"\small",
         r"\begin{tabular}{lccccc}",
@@ -112,7 +108,7 @@ def main() -> None:
             print(f"{site}: skipped (one class only in the evaluation subset)")
             continue
         y = g["y"].to_numpy()
-        # PC1 + PC2: unstandardised two-component PCA of the raw indicators, within the site
+        # Feature-Basic: unstandardised two-component PCA of the raw indicators, within the site
         pcs = PCA(n_components=int(raw_pca["components"]), random_state=int(s9["feature_basic_pca_seed"])) \
             .fit_transform(g[RAW].to_numpy(float))
         X = {"k": g[["k"]].to_numpy(float), "feature_basic": pcs, "morph25": g[RAW].to_numpy(float)}
@@ -128,7 +124,7 @@ def main() -> None:
             line[f"auc_{name}"] = round(roc_auc_score(y[te], proba), digits)
         rows.append(line)
         print(f"{site:<24} n={len(g):>7,}  k acc {line['acc_k']:.3f} AUC {line['auc_k']:.3f}  "
-              f"raw 25 acc {line['acc_morph25']:.3f} AUC {line['auc_morph25']:.3f}")
+              f"Morph-25 acc {line['acc_morph25']:.3f} AUC {line['auc_morph25']:.3f}")
     per_site = pd.DataFrame(rows)
     write_table(per_site, out / "k_persite_metrics.csv")
 

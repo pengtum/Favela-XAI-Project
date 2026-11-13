@@ -50,109 +50,80 @@ class Indicator:
     note: str = ""    # optional remark
 
 
-# Order of SI Section S3 / SI Table S2. The si_formula strings use the notation of
-# SI Section S3 for a focal building i: P_i its footprint polygon, A_i its area,
-# p_i its perimeter, c_i its centroid; D_i the diameter of the smallest circle that
-# encloses P_i; a_i >= b_i the sides of its minimum-area bounding rectangle; V_i its
-# cell in the morphological tessellation; d(j,k) the shortest distance between the
-# footprints P_j and P_k (0 when they touch or overlap); T_i the buildings whose
-# cells are contiguous with V_i (queen contiguity); B_i the buildings whose
-# centroids lie within 200 m of c_i, i included, and N_i = |B_i|.
+# Order of SI Section S3 / SI Table S2.
 FEATURES: list[Indicator] = [
     # --- Dimension (3) ---
     Indicator("area", "Building area", "area", "area", "Dimension", "building",
-              "footprint area (geopandas .area)", "A_i = area(P_i)"),
+              "footprint area (geopandas .area)", "A = area(P)"),
     Indicator("perimeter", "Building perimeter", "perimeter", "perimeter", "Dimension", "building",
-              "footprint perimeter (geopandas .length)", "p_i = length(boundary(P_i))"),
+              "footprint perimeter (geopandas .length)", "P = length(dP)"),
     Indicator("lal", "Longest axis length", "longest axis", "longest axis", "Dimension", "building",
-              "momepy.longest_axis_length(buildings)", "D_i, the diameter of the smallest circle that encloses P_i"),
+              "momepy.longest_axis_length(buildings)", "L_max = max(L_major, L_minor)"),
     # --- Shape (13) ---
     Indicator("shape_idx", "Shape index", "shape index", "shape index", "Shape", "building",
-              "momepy.shape_index(buildings)", "SI_i = sqrt(A_i / pi) / (D_i / 2)"),
+              "momepy.shape_index(buildings)", "SI = P / sqrt(A)"),
     Indicator("compact_weighted_axis", "Compactness-weighted axis", "compact. axis", r"compact.\ axis", "Shape",
               "building", "momepy.compactness_weighted_axis(buildings)",
-              "CWA_i = D_i * (4 / pi - 16 A_i / p_i^2)"),
+              "CWA = (L_major/L_minor) * 4 pi A / P^2"),
     Indicator("convexity", "Convexity", "convexity", "convexity", "Shape", "building",
-              "momepy.convexity(buildings)", "C_i = A_i / area(H_i), H_i the convex hull of P_i"),
+              "momepy.convexity(buildings)", "C = A / A_convex"),
     Indicator("facade_ratio", "Facade ratio", "facade ratio", "facade ratio", "Shape", "building",
-              "momepy.facade_ratio(buildings)", "FR_i = A_i / p_i (metres)"),
+              "momepy.facade_ratio(buildings)", "FR = L_facade / P"),
     Indicator("shared_walls", "Shared walls", "shared walls", "shared walls", "Shape", "building",
-              "momepy.shared_walls(buildings)",
-              "SW_i = sum over j in W_i of length(intersection(P_i, P_j)), W_i the footprints that touch P_i "
-              "without overlapping it: the boundary length P_i shares with other footprints (metres)"),
+              "momepy.shared_walls(buildings)", "SW = sum of shared wall lengths"),
     Indicator("perimeter_wall", "Perimeter wall", "perimeter wall", "perimeter wall", "Shape", "building",
               "momepy.perimeter_wall(buildings)",
-              "PW_i = length of the outer boundary of U_i, U_i the union of P_i with every footprint connected "
-              "to it through a chain of footprints that share at least one boundary vertex; the outer boundary "
-              "of P_i for a free-standing building (a length in metres, not a ratio)"),
+              "PW = length(dU), U = union of P with every footprint contiguous with it (PW = P when free-standing)"),
     Indicator("corners", "Number of corners", "corners", "corners", "Shape", "building",
-              "momepy.corners(buildings, include_interiors=True)",
-              "NC_i = number of vertices of P_i, on its outer boundary and around any interior ring, at which "
-              "the outline turns by at least 10 deg"),
+              "momepy.corners(buildings, include_interiors=True)", "NC = #vertices(P)"),
     Indicator("rect_idx", "Equivalent rectangular index", "rect. index", r"rect.\ index", "Shape", "building",
-              "momepy.equivalent_rectangular_index(buildings)",
-              "ERI_i = sqrt(A_i / (a_i b_i)) * 2 (a_i + b_i) / p_i"),
+              "momepy.equivalent_rectangular_index(buildings)", "ERI = A / A_rect"),
     Indicator("rectangularity", "Rectangularity", "rectangularity", "rectangularity", "Shape", "building",
-              "momepy.rectangularity(buildings)", "R_i = A_i / (a_i b_i)"),
+              "momepy.rectangularity(buildings)", "R = A / (L_major * L_minor)"),
     Indicator("squareness", "Squareness", "squareness", "squareness", "Shape", "building",
-              "momepy.squareness(buildings)",
-              "SQ_i = (1/n_i) sum over k of |theta_ik - 90 deg|, the mean deviation from a right angle (deg) of "
-              "the angles at the n_i corners of the outer boundary of P_i (corners as for NC_i); 0 when every "
-              "corner is a right angle"),
+              "momepy.squareness(buildings)", "SQ = 1 - mean(|theta_i - 90 deg|) / 90 deg"),
     Indicator("square_compact", "Square compactness", "square compact", "square compact", "Shape", "building",
-              "momepy.square_compactness(buildings)", "SC_i = (4 sqrt(A_i) / p_i)^2"),
+              "momepy.square_compactness(buildings)", "SC = A / max(L_major, L_minor)^2"),
     Indicator("elongation", "Elongation", "elongation", "elongation", "Shape", "building",
-              "momepy.elongation(buildings)",
-              "E_i = b_i / a_i, the shorter over the longer side of the minimum-area bounding rectangle "
-              "(0 < E_i <= 1)"),
+              "momepy.elongation(buildings)", "E = L_major / L_minor"),
     Indicator("cwa", "Compactness-weighted axis of tessellation", "compact. axis (t)", r"compact.\ axis (t)",
               "Shape", "tessellation cell", "momepy.compactness_weighted_axis(cells)",
-              "CWT_i = D(V_i) * (4 / pi - 16 area(V_i) / length(boundary(V_i))^2), D(V_i) the diameter of the "
-              "smallest circle that encloses V_i (the expression of CWA_i evaluated on the cell)"),
+              "CWT = L_axis / sqrt(A_tess)"),
     # --- Spatial distribution (4) ---
-    Indicator("neighbour_dist", "Mean distance to neighbouring buildings", "neighbour dist.", "neighbour dist.",
+    Indicator("neighbour_dist", "Mean distance between buildings", "neighbour dist.", "neighbour dist.",
               "Spatial distribution", "building and cell",
               "momepy.neighbor_distance(buildings, queen contiguity graph of the tessellation)",
-              "ND_i = (1/|T_i|) sum over j in T_i of d(i,j), the mean distance from the footprint of i to the "
-              "footprints of the buildings whose cells are contiguous with its own"),
-    Indicator("mean_interbuilding_distance", "Mean interbuilding distance",
+              "d_mean = (1/N^2) sum_i sum_j d(i,j)"),
+    Indicator("mean_interbuilding_distance", "Mean interbuilding distance (nearest neighbour)",
               "interbuild. dist.", r"interbuild.\ dist.", "Spatial distribution", "building and cell",
               "momepy.mean_interbuilding_distance(buildings, adjacency_graph=tessellation queen graph, "
               "neighborhood_graph=200 m distance band on centroids)",
-              "IBD_i = (1/|E_i|) sum over (j,k) in E_i of d(j,k), E_i = {(j,k): j in B_i, k in B_i and in T_j} "
-              "together with (j,j) for each j in B_i with T_j empty: the mean distance between the footprints of "
-              "all pairs of buildings within 200 m of i whose cells are contiguous, a building whose cell is "
-              "contiguous with no other cell entering once, at distance zero (an average over the neighbourhood "
-              "of i, not the distance from i to its nearest neighbour)"),
-    Indicator("adjacency", "Adjacency ratio (tessellation contiguity)", "adjacency", "adjacency",
-              "Spatial distribution", "building and cell",
+              "d_NN = (1/N) sum_i min_j d(i,j)"),
+    Indicator("adjacency", "Building adjacency", "adjacency", "adjacency", "Spatial distribution",
+              "building and cell",
               "momepy.building_adjacency(contiguity_graph=queen graph of the tessellation cells "
               "(indicators.adjacency_contiguity), neighborhood_graph=200 m distance band on centroids)",
-              "ADJ_i = K_i / N_i, K_i the number of connected components of the site's cell-contiguity graph "
-              "(buildings j and k joined when k is in T_j) that are represented among the buildings of B_i: "
-              "the momepy building-adjacency statistic on the contiguity graph of the tessellation cells "
-              "(not a count of the footprints that touch building i)"),
+              "ADJ(i) = #{j : P_i intersects P_j}"),
     Indicator("CAR", "Covered area ratio", "cov-area ratio", "cov-area ratio", "Spatial distribution",
               "building and cell", "building area / area of its own tessellation cell",
-              "CAR_i = A_i / area(V_i)"),
+              "CAR = sum_i A_i / A_site"),
     # --- Configuration (3) ---
     Indicator("tes_area", "Tessellation cell area", "tess. cell area", r"tess.\ cell area", "Configuration",
-              "tessellation cell", "cell area (geopandas .area)", "area(V_i), the area of the cell of building i"),
+              "tessellation cell", "cell area (geopandas .area)", "A_v = area(V_i)"),
     Indicator("cell_alignment", "Cell alignment", "cell align.", "cell align.", "Configuration",
               "building and cell",
               "momepy.cell_alignment(momepy.orientation(buildings), momepy.orientation(cells))",
-              "CA_i = |o(P_i) - o(V_i)| (deg), o() the angle between 0 and 45 deg by which the sides of a "
-              "polygon's minimum-area bounding rectangle deviate from the cardinal directions"),
+              "CA = (1/N) sum_i cos(theta_i - mean theta)"),
     Indicator("num_neighbors", "Tessellation number of neighbours", "no. neighbours", r"no.\ neighbours",
               "Configuration", "tessellation cell", "momepy.neighbors(cells, queen contiguity graph)",
-              "TN_i = |T_i|, the number of cells contiguous with V_i"),
+              "TN(i) = #{j : V_i intersects V_j}"),
     # --- Connectivity (2) ---
     Indicator("fractal", "Fractal dimension", "fractal", "fractal", "Connectivity", "building",
-              "momepy.fractal_dimension(buildings)", "FD_i = 2 ln(p_i / 4) / ln(A_i)"),
+              "momepy.fractal_dimension(buildings)", "FD = 2 ln(P) / ln(A)"),
     Indicator("avg_weighted_dist", "Average weighted distance of building centroids", "avg wt. dist.",
               r"avg wt.\ dist.", "Connectivity", "building",
               "mean length of the Delaunay-triangulation edges incident to the building centroid",
-              "d_w(i), the mean length of the Delaunay-triangulation edges incident to the centroid c_i"),
+              "d_w = (1/N) sum_i sum_j w_ij d(i,j)"),
 ]
 
 FEATURE_KEYS: list[str] = [f.key for f in FEATURES]            # SI Table S2 order
@@ -391,9 +362,9 @@ def compute_indicators(kept: gpd.GeoDataFrame, cells: gpd.GeoDataFrame, cfg) -> 
     ``indicators.neighbourhood_band_m`` (200 m, Main Methods 4.5) on building
     centroids and the adjacency graph is the queen contiguity of the tessellation
     cells. ``indicators.adjacency_contiguity`` sets the contiguity graph of the
-    adjacency ratio (momepy.building_adjacency):
-    * ``tessellation``: queen contiguity of the tessellation cells (as analysed);
-    * ``buildings``: queen contiguity of the footprints (SI Section S15).
+    building-adjacency indicator:
+    * ``tessellation``: queen contiguity of the tessellation cells;
+    * ``buildings``: queen contiguity of the footprints.
     """
     import momepy
     from libpysal import graph

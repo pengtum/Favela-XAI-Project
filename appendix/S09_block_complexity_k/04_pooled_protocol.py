@@ -2,8 +2,8 @@
 
 Manuscript items
 * SI Table S7: AUC mean and s.d. over five folds of one classifier trained on
-  the buildings of all ten sites, for block complexity k alone and the raw 25
-  indicators (rows of the table).
+  the buildings of all ten sites, for block complexity k alone and Morph-25
+  (the raw 25 indicators).
 * SI S9 'Pooled cross-site protocol'.
 
 Protocol (config.yaml ``block_complexity.pooled``, ``model_main``)
@@ -47,7 +47,7 @@ from k_common import RAW, evaluation_subset, read_k, site_table, tex_int, tex_nu
 # feature set -> (row label of SI Table S7, columns)
 FEATURE_SETS = {
     "k": ("Block complexity $k$ alone", ["k"]),
-    "morph25": ("Raw 25 indicators", RAW),
+    "morph25": ("Morph-25 (raw 25 indicators)", RAW),
 }
 
 

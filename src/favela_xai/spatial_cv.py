@@ -10,9 +10,8 @@ error-rate analysis. Every seed and setting is read from ``spatial_cv`` and
 ``model_cv`` in config.yaml.
 
 Designs (SI S12 'Designs')
-* square blocks of 100-1,000 m in three grid placements, assigned whole to five
-  folds by a greedy rule that balances building count and favela share
-  (``design_square``, ``assign_folds``);
+* square blocks of 100-1,000 m in three grid placements, five folds balanced
+  in building count and favela share (``design_square``);
 * training buffers that remove every training building within b metres of any
   test building (``buffer_train``) and matched random-removal controls
   (``control_train``);

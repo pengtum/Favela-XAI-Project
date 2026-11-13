@@ -16,10 +16,9 @@ Design (config.yaml)
   boundary_errors.blocked_design   250 m square blocks, first grid placement (placement 0), with a
                                    200 m training buffer; the same blocks without a buffer are
                                    reported alongside
-  spatial_cv                       whole blocks assigned to five folds by a greedy rule that balances
-                                   building count and favela share (fold seed 42 + placement); a
-                                   buffer removes every training building within the buffer
-                                   distance of any test building
+  spatial_cv                       five folds balanced on building count and favela share (fold seed
+                                   42 + placement); a buffer removes every training building within
+                                   the buffer distance of any test building
   model_cv                         XGBoost 100 trees, seed 432, training-median imputation (Methods 4.5)
   spatial_cv.scoring               criterion 1: a fold is used only if its training set holds at
                                    least 50 buildings of the minority class; criterion 2: a site is
