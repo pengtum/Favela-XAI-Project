@@ -11,7 +11,7 @@
 # * Comments give the manuscript item that each parameter belongs to:
 #   "Methods" = Methods of the main text, "SI" = Supplementary Information,
 #   "ED" = Extended Data. Main Figs 1-5, ED Figs 1-5, SI Figs S1-S23,
-#   SI Tables S1-S18.
+#   SI Tables S1-S19.
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -87,7 +87,7 @@ products:
 # window: rectangular analysis window around the favela of interest,
 #   [xmin, ymin, xmax, ymax] in EPSG:31983.
 # extract_records: number of 2013 footprints in the window (ten sites:
-#   188,735 buildings, Methods 4.1).
+#   188,735 building footprints, Methods 4.1).
 # The list order (alphabetical by key) is the order used by every loop and by
 # every site bootstrap; do not reorder it.
 # -----------------------------------------------------------------------------
@@ -817,7 +817,7 @@ appendix_S09_block_complexity_k:
   # momepy.Tessellation parameters
   tessellation_shrink: 0.4
   tessellation_segment: 0.5
-  # SI Table S6 'Feature-Basic' PCA seed
+  # PCA seed of the 'PC1 + PC2' row of SI Table S6
   feature_basic_pca_seed: 42
   # Per-site accuracy / AUC rounded to 3 decimals before averaging; s.d.
   # across sites (SI Table S6) and across folds (SI Table S7) with ddof 0.

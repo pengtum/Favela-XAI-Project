@@ -13,8 +13,8 @@ relationship between *k* and the favela label differs between sites.
 | Item | Script |
 |---|---|
 | Methods 4.9 and SI S9 "Implementation summary": blocks, k per building, share of buildings outside every block | 01, 02 |
-| SI Table S6: per-site protocol (k alone, Feature-Basic, Morph-25); mean per-site AUC quoted in the Discussion | 03 |
-| SI Table S7: pooled cross-site protocol (k alone, Morph-25) | 04 |
+| SI Table S6: per-site protocol (rows "Block complexity k alone", "PC1 + PC2 of the raw 25 indicators", "Raw 25 indicators"); mean per-site AUC quoted in the Discussion | 03 |
+| SI Table S7: pooled cross-site protocol (rows "Block complexity k alone", "Raw 25 indicators") | 04 |
 | SI S9 and S9.2: distribution of k by label, per-site Cohen's d and AUC of k | 05 |
 | SI Fig. S13: distribution of k by label | 06 |
 
@@ -59,5 +59,5 @@ tables, the two building subsets, number formatting); it is not run on its own.
 - k: tessellation within each block; cells are adjacent when they share > 1 cm of boundary; cells touching the block boundary (0.5 m buffer) have k = 1, the others their breadth-first-search depth from those cells + 1.
 - Building subsets (`k_common.py`): valid k (k >= 1) with complete Tree-SHAP attributions for the distribution of k; in addition all 25 indicators present for the classification comparison.
 - Classifier (`model_main`): XGBoost, 200 trees, max depth 6, learning rate 0.1, seed 42 (Methods 4.4); per-site stratified 80/20 split (seed 42); pooled stratified 5-fold cross-validation (seed 42).
-- Feature-Basic (`pca.raw_benchmark`): two-component PCA of the unstandardised 25 indicators, fitted within each site.
+- PC1 + PC2 of the raw 25 indicators (`pca.raw_benchmark`): two-component PCA of the unstandardised 25 indicators, fitted within each site.
 - Download and layout settings: `appendix_S09_block_complexity_k`.

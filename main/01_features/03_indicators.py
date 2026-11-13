@@ -14,9 +14,10 @@ Method (favela_xai.features.compute_indicators)
   centroids for the neighbourhood; covered area ratio = footprint area / cell
   area; average weighted distance = mean length of the Delaunay edges at each
   centroid. indicators.adjacency_contiguity (tessellation | buildings): queen
-  contiguity of the tessellation cells or of the footprints, used by the
-  building-adjacency indicator. The indicator registry (names, labels,
-  dimensions, SI S3 formulas) is favela_xai.features.FEATURES.
+  contiguity of the tessellation cells (as analysed) or of the footprints, used
+  by the adjacency ratio (the two are compared in SI Section S15). The
+  indicator registry (names, labels, dimensions, SI S3 formulas) is
+  favela_xai.features.FEATURES.
 
 Inputs (outputs/main/01_features/, written by 02_tessellation.py)
   <site>_buildings_tessellated.gpkg, <site>_tessellation.gpkg; config.yaml: indicators.*

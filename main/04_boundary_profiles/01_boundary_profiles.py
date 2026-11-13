@@ -11,9 +11,9 @@ Manuscript items
 * SI Section S6: x0 = +4.7 m (mean interbuilding distance), +4.2 m
   (adjacency), +4.9 m (perimeter wall), +3.0 m (squareness), widths of about
   16-18 m, average weighted distance changing sign about 6 m inside.
-* Results 2.3: the leading spatial-distribution indicators change sign a few
-  metres outside the polygon over a graded transition with narrow cross-site
-  bands.
+* Results 2.3: the signature shifts gradually across the boundary; the
+  transition is led by the spatial-distribution indicators, which change sign a
+  few metres outside the polygon.
 
 Definitions (config.yaml, sections 'signed_distance' and 'boundary_profiles')
 * Signed distance: Euclidean distance from the building centroid to the nearest

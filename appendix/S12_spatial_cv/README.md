@@ -19,7 +19,7 @@ trees, seed 432, training-median imputation) and explained with out-of-fold Tree
 | Supplementary Table S16 (ranking stability) | 11 |
 | Extended Data Fig. 3 (rankings under spatial cross-validation) | 11, 13 (panel a: `ed3_schematic.py`) |
 | Extended Data Fig. 4 (per-site importance shares) | 11, 14 |
-| Per-fold record summarised in SI Table S14 | 15 |
+| Supplementary Data 1 and 2: per-fold record of the spatial validation and of the held-out favela component (summarised in SI Table S14) | 15 |
 
 Main results (both scoring criteria, site-bootstrap 95% intervals):
 
@@ -48,7 +48,7 @@ python appendix/S12_spatial_cv/11_ranking_stability.py    # Supplementary Table 
 python appendix/S12_spatial_cv/12_direction_survival.py   # direction of the attributions
 python appendix/S12_spatial_cv/13_figure_ED3.py           # Extended Data Fig. 3
 python appendix/S12_spatial_cv/14_figure_ED4.py           # Extended Data Fig. 4
-python appendix/S12_spatial_cv/15_supplementary_data.py   # per-fold record (two CSV files)
+python appendix/S12_spatial_cv/15_supplementary_data.py   # per-fold record: Supplementary Data 1 and 2 (two CSV files)
 ```
 
 Steps 03 and 10 fit several thousand models. They write one shard per site and job and skip existing shards, so an interrupted run resumes with the same command, and different `--sites` can run in parallel.
@@ -72,3 +72,12 @@ All settings are in `config.yaml`: `spatial_cv` (block sizes, placements, buffer
 
 * `model_cv`: validation-pipeline model on an unstratified 80/20 split;
 * `model_main`: the Methods 4.4 model on a stratified 80/20 split.
+
+The released configuration selects `model_cv` for the split-refit reference: 100
+trees, model seed 432, and three unstratified 80/20 splits with split seeds 7, 99
+and 2024. Each refit's ranking is compared with the main-analysis ranking
+(`model_main`: 200 trees, maximum depth 6, learning rate 0.1, model seed 42,
+stratified 80/20 split with split seed 42). The reference therefore varies the
+model specification and split convention as well as the split seed; it is not a
+refit of the main-model specification with only a new split. The reported
+`rho minus null` contrasts are differences relative to this refit reference.

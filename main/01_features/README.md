@@ -11,8 +11,8 @@ writes SI Table S2 and draws the element maps of Fig. 1.
 
 | Item | Script |
 |---|---|
-| Methods 4.1: ten sites, 188,735 buildings, 82,015 within official favela boundaries | 01, 04 |
-| Methods 4.2, SI Section S1: footprint pre-processing; <0.1% of geometries per site discarded at the tessellation stage | 01, 02, 04 |
+| Methods 4.1: ten sites, 188,735 building footprints, 82,015 within official favela boundaries; 188,292 buildings analysed | 01, 04 |
+| Methods 4.2, SI Section S1: footprint pre-processing; 443 of the 188,735 footprints (0.23%) discarded at the tessellation stage | 01, 02, 04 |
 | Methods 4.3, SI Section S3: 25 indicators in five dimensions (dimension 3, shape 13, spatial distribution 4, configuration 3, connectivity 2), computed with momepy | 03 |
 | SI Table S2: indicator names, figure labels and dimensions | 06 |
 | Methods 4.7-4.8: signed distance to the official 2013 favela boundary (input of all boundary analyses) | 05 |
@@ -67,6 +67,7 @@ Data are not distributed with the code; `data/README.md` lists the sources.
 ## Settings with alternatives
 
 - `indicators.adjacency_contiguity` (tessellation | buildings): queen contiguity
-  of the tessellation cells or of the footprints, used by the building-adjacency indicator.
+  of the tessellation cells (as analysed) or of the footprints, used by the adjacency
+  ratio; `appendix/S15_adjacency_sensitivity` compares the two (SI Section S15).
 - `signed_distance.dissolve_polygons` (false | true): distance to the edges of
   the individual 2013 polygons or to the boundary of their dissolved union.

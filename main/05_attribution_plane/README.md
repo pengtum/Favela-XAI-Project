@@ -43,7 +43,7 @@ python main/05_attribution_plane/03_raw_benchmark_numbers.py   # Results 2.4 ben
 | `persite_summary.csv` | per site: class means of PC1 and PC2, PC1-only AUC | 01 |
 | `figure5.pdf`, `figure5.svg` | Fig. 5 (183 mm wide) | 02 |
 | `panel_stats.csv` | per site: out-of-fold AUC of a logistic regression on PC1 and PC2 (numerical summary of each panel's class separation) | 02 |
-| `raw_benchmark_summary.csv` | Feature-Basic and Morph-25 rows of SI Table S6 | 03 |
+| `raw_benchmark_summary.csv` | rows "PC1 + PC2 of the raw 25 indicators" and "Raw 25 indicators" of SI Table S6 | 03 |
 
 ## Settings (`config.yaml`: `pca`, `main_05_attribution_plane`, `display_orders.figure5_panels`)
 
@@ -51,4 +51,4 @@ python main/05_attribution_plane/03_raw_benchmark_numbers.py   # Results 2.4 ben
 - Component signs (`orient_pc1`, `orient_pc2`): PC1 oriented so that the pooled favela mean is above the formal mean; PC2 with its largest loading positive.
 - Density regions: Gaussian kernel density of each class on a 150 × 150 grid over the 1st-99th percentile box, from at most 20,000 buildings per site (seed 42); region = grid cells above the 85th percentile of the class density.
 - Points: random samples of up to 2,000 buildings per class (seed 42).
-- Raw-indicator benchmark (`pca.raw_benchmark`, `block_complexity.persite`): per site, two-component PCA of the 25 unstandardised raw indicators, evaluated on the SI S9 subset (buildings with a valid block-complexity index k); the 25-indicator reference (0.932 / 0.974) is the Morph-25 row of SI Table S6 on the same subset.
+- Raw-indicator benchmark (`pca.raw_benchmark`, `block_complexity.persite`): per site, two-component PCA of the 25 unstandardised raw indicators, evaluated on the SI S9 subset (buildings with a valid block-complexity index k); the 25-indicator reference (0.932 / 0.974) is the "Raw 25 indicators" row of SI Table S6 on the same subset.

@@ -2,8 +2,8 @@
 
 Manuscript items
   * Methods 4.2 and SI Section S1: geometries failing at the tessellation stage
-    (tessellation failure, too small, invalid) are discarded, <0.1% of the
-    geometries of any site (share per site written by 04_site_summary.py).
+    (tessellation failure, too small, invalid) are discarded, 443 of the 188,735
+    footprints (0.23%) (counts and shares per site written by 04_site_summary.py).
   * The cells are the basis of the tessellation indicators of Methods 4.3 and
     SI Section S3 (cell area, compactness-weighted axis, number of neighbours,
     covered area ratio, cell alignment) and of the contiguity graph of the

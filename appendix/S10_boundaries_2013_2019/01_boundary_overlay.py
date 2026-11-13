@@ -26,11 +26,18 @@ Inputs
   paths.raw.favelas_2019; Data.Rio, the 2019 polygons accessed in September
   2024).
 
+Label provenance: the paper retains the labels assigned when the study data
+were prepared. The recomputed 2013 overlay in Table S8 differs from those labels
+for 15 buildings (a net increase of five favela buildings). A fresh pipeline run
+assigns labels using the configured geometric rule. With the default
+footprint_intersects rule, labels and the 2013 overlay are expected to agree
+when computed from the same footprints and boundaries. The historical
+15-building discrepancy is not an expected discrepancy for a fresh rebuild.
+
 Outputs (outputs/appendix/S10_boundaries_2013_2019/)
 * overlay_counts.csv            per site: the four status counts, the number of
-                                buildings, the buildings whose 2013 status differs
-                                from their label (zero by construction, since the
-                                labels use the same rule), and the centroid rule
+                                buildings, the buildings whose 2013 overlay status
+                                differs from their label, and the centroid rule
                                 for comparison only
 * table_S8_boundary_status_counts.csv   SI Table S8 (rows in the printed
                                 order, sum row)
