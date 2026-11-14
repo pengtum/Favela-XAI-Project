@@ -12,8 +12,8 @@ figure labels and dimensions used by every figure script. No input data needed.
 Outputs (outputs/main/01_features/)
   table_S2_indicators.tex   tabular of SI Table S2 (header and 25 rows)
   indicator_registry.csv    one row per indicator: column name, full name, figure label,
-                            dimension, computed on, momepy computation, SI S3 formula and
-                            a note relating the two
+                            dimension, computed on, computation (momepy call or geometry
+                            operation) and SI S3 formula
 
 Run from the repository root:
   python main/01_features/06_table_S2.py

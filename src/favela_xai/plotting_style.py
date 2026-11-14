@@ -6,7 +6,7 @@ One place for fonts, sizes and colours so that every figure of the manuscript
   (``pdf.fonttype = 42``), editable text in SVG;
 * Nature widths: 89 mm (single column) and 183 mm (double column);
 * class colours: favela blue / formal-settlement green on maps (Main Figs 1-2,
-  SI Fig. S2), favela orange for SHAP evidence (Main Figs 3-5);
+  SI Fig. S2), favela orange for SHAP evidence (Main Fig. 3; SI Fig. S7);
 * the five morphometric dimensions (frame and bar colours of Main Figs 3-4 and
   ED Fig. 2);
 * the diverging blue-white-orange map of Tree-SHAP values (orange = toward favela).
@@ -43,7 +43,7 @@ MISCLASSIFIED_FORMAL = "#E74C3C"   # second error colour of SI Fig. S2 (formal b
 NEUTRAL_BUILDING = "#e8e8e8"       # buildings not shown in a category (e.g. training buildings)
 BOUNDARY = "#1a1a1a"               # official 2013 favela boundary
 
-# Classes in attribution plots (Main Figs 3-5)
+# Classes in attribution plots (Main Fig. 3 insets; SI Fig. S7)
 FAVELA_SHAP = "#E28E2C"            # favela / toward favela (orange)
 FORMAL_SHAP = "#6BAED6"            # formal settlement (light blue)
 

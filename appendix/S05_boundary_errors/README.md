@@ -46,7 +46,7 @@ The scripts are independent of each other; `s05_common.py` holds shared helpers.
 
 - `Figure_R1_boundary_exposure.pdf`: Extended Data Fig. 1 (01).
 - `table_R1_exposure_bands.tex`: Supplementary Table S4 (02).
-- `Figure_R1_spatial_mapping.pdf`, `spatial_mapping_sites/<site>.pdf`, `spatial_mapping_counts.csv`: Supplementary Fig. S2, one map per site, test buildings by outcome (03).
+- `Figure_R1_spatial_mapping.pdf`, `spatial_mapping_sites/<site>.pdf`, `spatial_mapping_counts.csv`: Supplementary Fig. S2 (every building, training and held-out test, coloured by its outcome), one map per site, and the numbers of held-out test buildings by outcome (03).
 - `Figure_R1_failure_shap.pdf`, `failure_drivers.csv`, `failure_drivers_numbers.txt`: Supplementary Fig. S3 and the driver numbers (04).
 - `Figure_R1_casestudies_class.pdf`, `Figure_R1_casestudies_driver.pdf`, `case_study_representatives.csv`: Supplementary Figs S4 and S5 (05).
 

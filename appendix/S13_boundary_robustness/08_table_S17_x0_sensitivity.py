@@ -90,7 +90,7 @@ def main() -> None:
     t5_path = cfg.product("transition_metrics")
     if t5_path.exists():
         t5 = pd.read_csv(t5_path).set_index("feature").loc[rc.KEY5]
-        if not np.allclose(t5["x0_m"].to_numpy(), K["x0_full"].to_numpy(), atol=1e-3):
+        if not np.allclose(t5["x0"].to_numpy(), K["x0_full"].to_numpy(), atol=1e-3):
             raise ConfigError("the 'All' column differs from x0 in SI Table S5 (main/04_boundary_profiles)")
         print("check: 'All' column equals x0 of SI Table S5 (main/04_boundary_profiles): OK")
     else:

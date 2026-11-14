@@ -7,7 +7,7 @@ Manuscript items
   * Used by the misclassification rates (Fig. 2c, Extended Data Fig. 1;
     main/02_classification), the boundary profiles (Fig. 4;
     main/04_boundary_profiles) and the boundary analyses of SI Sections S5,
-    S6 and S12-S14.
+    S6 and S12-S15 (SI Table S19).
 
 Method (favela_xai.boundary.signed_distance)
   Per site, the 2013 polygons that intersect the extent of the site's buildings

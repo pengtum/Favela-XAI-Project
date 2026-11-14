@@ -1,7 +1,8 @@
 """Step 15: the per-fold record of the spatial validation (two CSV files).
 
-Manuscript items: the per-fold record (accuracy, AUC, favela-class F1, class
-prevalence, training and test sizes) summarised in SI Table S14.
+Manuscript items: Supplementary Data 1 and 2, the per-fold record (accuracy, AUC,
+favela-class F1, class prevalence, training and test sizes) summarised in SI
+Table S14.
 
 File 1: every fold of the square-block, alternative-unit, random and
 pooled leave-site-out designs (8,020 rows with the ten sites). File 2:

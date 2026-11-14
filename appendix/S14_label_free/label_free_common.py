@@ -10,8 +10,9 @@ manuscript item by itself. It holds:
 * the label-free representation: median imputation and rank transform to a
   standard normal distribution (SI S14 'Design'; Main Methods 'Label-free
   clustering of the morphological indicators') and the three weightings;
-* clustering (k-means; Ward on a random subsample with the remaining buildings
-  assigned to the nearest centroid) and the scores (adjusted Rand index, best
+* clustering (k-means; Ward fitted on a random subsample, the remaining
+  buildings and the subsample itself then assigned to the nearest Ward
+  centroid) and the scores (adjusted Rand index, best
   balanced accuracy over assignments of clusters to classes, two-cluster score);
 * the 6 m boundary profile, its normalisation and level crossings.
 

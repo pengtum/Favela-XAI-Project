@@ -1,15 +1,14 @@
-"""Step 2: per-site test-set performance (SI Table S3; Fig. 2b; Results 2.1 numbers).
+"""Step 2: per-site test-set performance (SI Table S3; Fig. 2b; Results 2.1 accuracies).
 
 Manuscript items
   * SI Table S3: per-site classification performance on the held-out test set
     (favela as positive class): accuracy, precision, recall, F1 (favela),
-    F1 (macro), with the mean over the ten sites; SI Section S4: Rocinha F1
-    0.980, Nova Cidade 0.788, Grotao de Costa Barros 0.852.
-  * Fig. 2b: per-site held-out test accuracy and the ten-site mean (0.933)
-    (drawn by 06_figure2.py from the CSV written here).
-  * Results 2.1: mean accuracy 93.3%, per-site F1 0.79-0.98,
-    highest accuracy Rocinha (0.977), lowest Nova Cidade (0.881) and Grotao de
-    Costa Barros (0.866).
+    F1 (macro), with the mean over the ten sites; SI Section S4: F1 (favela)
+    of Rocinha, Nova Cidade and Grotao de Costa Barros.
+  * Fig. 2b: per-site held-out test accuracy and the ten-site mean (drawn by
+    06_figure2.py from the CSV written here).
+  * Results 2.1: mean accuracy over the ten sites, range of the per-site F1
+    (favela), and the highest and lowest per-site accuracies.
 
 Metrics (favela_xai.model.classification_metrics): accuracy; precision, recall
 and F1 with favela as the positive class; macro-averaged F1 over the two
@@ -23,7 +22,7 @@ Outputs (outputs/main/02_classification/)
   table_S3_site_metrics.csv   products.site_metrics: site, name, n_test, favela_share_test,
                               accuracy, precision, recall, f1_favela, f1_macro (one row per site)
   table_S3_site_metrics.tex   tabular of SI Table S3 (rows in the printed order, mean row)
-  table_S3_summary.txt        the numbers quoted in Results 2.1 and SI Section S4
+  table_S3_summary.txt        the Results 2.1 and SI Section S4 quantities computed in this run
 
 Run from the repository root:
   python main/02_classification/02_table_S3.py

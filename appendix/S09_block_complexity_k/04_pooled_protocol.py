@@ -2,8 +2,8 @@
 
 Manuscript items
 * SI Table S7: AUC mean and s.d. over five folds of one classifier trained on
-  the buildings of all ten sites, for block complexity k alone and Morph-25
-  (the raw 25 indicators).
+  the buildings of all ten sites, for block complexity k alone and the raw 25
+  indicators (rows of the table).
 * SI S9 'Pooled cross-site protocol'.
 
 Protocol (config.yaml ``block_complexity.pooled``, ``model_main``)
@@ -47,7 +47,7 @@ from k_common import RAW, evaluation_subset, read_k, site_table, tex_int, tex_nu
 # feature set -> (row label of SI Table S7, columns)
 FEATURE_SETS = {
     "k": ("Block complexity $k$ alone", ["k"]),
-    "morph25": ("Morph-25 (raw 25 indicators)", RAW),
+    "morph25": ("Raw 25 indicators", RAW),
 }
 
 
@@ -62,7 +62,7 @@ def table_tex(res: pd.DataFrame, cfg) -> str:
         rf"\caption{{Pooled cross-site classification AUC ({pooled['n_folds']}-fold stratified",
         rf"  cross-validation, XGBoost with {m['n_estimators']} trees, max depth {m['max_depth']}, learning",
         rf"  rate {tex_number(m['learning_rate'], None)}, random seed {m['random_state']}; n = {tex_int(res['n'].iloc[0])}",
-        r"  buildings with valid $k$ and deep-feature attributions across the",
+        r"  buildings with valid $k$ and all 25 indicators across the",
         r"  ten sites).}",
         r"\label{tab:bettencourt_pooled}",
         r"\small",

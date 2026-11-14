@@ -6,7 +6,7 @@ Manuscript items
     for two representative favelas (Faz Quem Quer, Morro da Guaiba), with the
     official 2013 favela boundary.
   * Fig. 2b: per-site held-out test accuracy, ordered high to low, and the
-    ten-site mean (0.933).
+    ten-site mean (dashed line).
   * Fig. 2c: misclassification rate by signed distance to the 2013 favela
     boundary (negative inside, positive outside; 6 m bins) from stratified
     five-fold cross-validation (XGBoost, 100 trees, seed 432): all sites with
@@ -223,7 +223,7 @@ def main() -> None:
     by_class = f2.get("misclassified_colours", "by_class") == "by_class"
     handles = [Patch(fc=FAVELA_MAP), Patch(fc=FORMAL_MAP),
                (Patch(fc=MISCLASSIFIED), Patch(fc=MISCLASSIFIED_FORMAL)) if by_class else Patch(fc=MISCLASSIFIED)]
-    labels = ["Favela", "Formal settlement", "Misclassified"]
+    labels = ["Favela", "Formal settlement", "misclassified"]
     if f2["panel_a_buildings"] == "test_only":
         handles.append(Patch(fc=NEUTRAL_BUILDING))
         labels.append("Training set (not evaluated)")

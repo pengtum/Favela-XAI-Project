@@ -3,27 +3,36 @@
 Manuscript items
   * Methods 4.3, SI Section S3 and SI Table S2: 25 indicators in five
     dimensions (dimension 3, shape 13, spatial distribution 4, configuration 3,
-    connectivity 2), computed with momepy.
+    connectivity 2), computed with momepy or, for areas, perimeters and the
+    covered area ratio, directly from the geometries; average weighted distance
+    from a Delaunay triangulation of the building centroids (scipy).
   * Methods 4.5: the spatial indicators use a 200 m neighbourhood.
   * The per-site building tables written here (products.features_gpkg) are the
     input of main/02_classification and of every later analysis.
 
 Method (favela_xai.features.compute_indicators)
   momepy functional API with libpysal graphs: queen contiguity of the
-  tessellation cells for adjacency, a 200 m distance band on building
-  centroids for the neighbourhood; covered area ratio = footprint area / cell
+  tessellation cells for the sets T_i (items 17-19 and 23), a 200 m distance
+  band on building centroids for the neighbourhoods B_i (items 18 and 19);
+  covered area ratio = footprint area / cell
   area; average weighted distance = mean length of the Delaunay edges at each
-  centroid. indicators.adjacency_contiguity (tessellation | buildings): queen
-  contiguity of the tessellation cells or of the footprints, used by the
-  building-adjacency indicator. The indicator registry (names, labels,
-  dimensions, SI S3 formulas) is favela_xai.features.FEATURES.
+  centroid; equivalent rectangular index, rectangularity, elongation and cell
+  alignment (items 11, 12, 15 and 22) evaluated on the minimum-area bounding
+  rectangle of SI S3, computed in the same way for every GEOS version
+  (favela_xai.features.minimum_area_rectangle).
+  indicators.adjacency_contiguity (tessellation | buildings): queen
+  contiguity of the tessellation cells (as analysed) or of the footprints, used
+  by the adjacency ratio (the two are compared in SI Section S15). The
+  indicator registry (names, labels, dimensions, SI S3 formulas) is
+  favela_xai.features.FEATURES.
 
 Inputs (outputs/main/01_features/, written by 02_tessellation.py)
   <site>_buildings_tessellated.gpkg, <site>_tessellation.gpkg; config.yaml: indicators.*
 
 Outputs (outputs/main/01_features/)
-  <site>_buildings_features.gpkg      products.features_gpkg: uID, cod_unico, Tipo, label,
-                                      the 25 indicators, geometry (EPSG:31983)
+  <site>_buildings_features.gpkg      products.features_gpkg: uID, cod_unico, Tipo, ALTURA
+                                      (recorded height), label, the 25 indicators, geometry
+                                      (EPSG:31983)
   steps/<site>_indicator_missing.csv  missing values per indicator (collected by 04_site_summary.py)
 
 Run from the repository root (all sites, or a subset):
@@ -87,7 +96,8 @@ def main() -> None:
             warnings.simplefilter("ignore")     # momepy / libpysal notes on islands and deprecations
             indicators = compute_indicators(buildings, cells, cfg)
 
-        # One row per building: identifiers, label, the 25 indicators, footprint.
+        # One row per building: uID, the attributes kept from the 2013 layer
+        # (main_01_features.keep_source_columns), label, the 25 indicators, footprint.
         front = ["uID"] + [c for c in keep_cols if c in buildings.columns] + ["label"]
         table = pd.concat([buildings[front], indicators[MODEL_FEATURE_ORDER]], axis=1)
         gdf = gpd.GeoDataFrame(table, geometry=buildings.geometry, crs=buildings.crs).reset_index(drop=True)

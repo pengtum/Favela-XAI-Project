@@ -12,7 +12,7 @@ strength |ΔS|, sign-flip distance x₀ and transition width w (Methods 4.8).
 | Fig. 4: cross-site mean Tree-SHAP profile (line) ± 1 s.d. across the ten sites (band) against signed distance, 25 panels grouped by morphometric dimension; dot at x₀ where \|ΔS\| ≥ 0.1 | 01 (data), 02 (drawing) |
 | SI Table S5: \|ΔS\|, x₀ and w of the 25 indicators | 01 (values), 03 (LaTeX) |
 | SI Section S6: x₀ of the leading indicators (mean interbuilding distance +4.7 m, adjacency +4.2 m, perimeter wall +4.9 m, squareness +3.0 m), widths of about 16-18 m, average weighted distance changing sign about 6 m inside | 03 (printed) |
-| Results 2.3: the spatial-distribution indicators change sign a few metres outside the polygon, over a graded transition consistent across sites | 01, 02 |
+| Results 2.3: the signature shifts gradually across the boundary; the transition is led by the spatial-distribution indicators, which change sign a few metres outside the polygon | 01, 02 |
 
 Related items computed elsewhere: misclassification drivers (SI Fig. S3) in
 `appendix/S05_boundary_errors`; classification-probability profile (SI Fig. S6)

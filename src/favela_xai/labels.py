@@ -57,7 +57,7 @@ def assign_labels(buildings: gpd.GeoDataFrame, polygons_2013: gpd.GeoDataFrame, 
     """Label every building 'favela' or 'not-favela' from the 2013 polygons (config ``labels``)."""
     lab = cfg.section("labels")
     if not lab.get("dissolve_polygons", True):
-        raise ValueError("labels are defined on the dissolved 2013 polygons (Methods 4.1, 4.12)")
+        raise ValueError("labels.dissolve_polygons must be true (the labels are computed on the dissolved 2013 polygons)")
     union = polygon_union(polygons_2013.to_crs(buildings.crs))
     inside = inside_polygons(buildings, union, lab["rule"])
     return pd.Series(np.where(inside, lab.get("favela", FAVELA), lab.get("formal", FORMAL)),

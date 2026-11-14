@@ -87,7 +87,7 @@ def main() -> None:
             ax.plot(x0, 0, marker="o", ms=8, mfc=(0.1, 0.1, 0.1, 0.40 * aa), mec=(0.1, 0.1, 0.1, aa), mew=1.4,
                     zorder=9)
             ha, dx = ("left", 7) if x0 < 25 else ("right", -7)
-            ax.annotate(f"$x_0$={x0:+.1f} m", (x0, 0), xytext=(dx, 9), textcoords="offset points", ha=ha,
+            ax.annotate(f"{x0:+.1f} m", (x0, 0), xytext=(dx, 9), textcoords="offset points", ha=ha,
                         fontsize=7.3, color="#1a1a1a", alpha=aa, fontweight="bold", zorder=9)
         ax.set_xlim(-half, half)
         for sp in ax.spines.values():
@@ -98,18 +98,14 @@ def main() -> None:
         ax.tick_params(labelsize=7.5)
         ax.locator_params(axis="both", nbins=3)
         if k % 5 == 0:
-            ax.set_ylabel("SHAP ($\\rightarrow$ fav.)", fontsize=8.5)
+            ax.set_ylabel("shap value", fontsize=8.5)
     for ax in axf[len(metrics):]:
         ax.set_visible(False)
 
     handles = [Patch(ec=DIMENSION_COLOURS[g], fc="none", lw=2.8, label=g) for g in group_order]
     handles += [Line2D([0], [0], marker="o", color="none", mfc="#1a1a1a", mec="white", ms=8,
-                       label="$x_0$ = SHAP sign-flip (favela $\\to$ formal); label = its distance from boundary")]
-    fig.legend(handles=handles, loc="upper center", ncol=3, fontsize=10, bbox_to_anchor=(0.5, 0.965),
-               title="frame colour = morphometric dimension; line = cross-site mean, band = $\\pm$1 SD; "
-                     "red dashed = official 2013 favela boundary", title_fontsize=9.5)
-    fig.suptitle("Boundary profile of every indicator: SHAP vs signed distance to the official favela boundary"
-                 " — dot marks where each feature flips favela$\\to$formal", fontsize=12, y=1.0)
+                       label="where SHAP sign flip from favela to formal settlement")]
+    fig.legend(handles=handles, loc="upper center", ncol=3, fontsize=10, bbox_to_anchor=(0.5, 0.965))
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     for ext in ("pdf", "svg"):
         fig.savefig(out / f"figure4.{ext}", bbox_inches="tight", dpi=300)

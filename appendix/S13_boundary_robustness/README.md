@@ -21,8 +21,9 @@ per-site model are held fixed; nothing is refitted.
   (mean interbuilding distance) and 1.70 (adjacency) on the real line, against
   at most 1.30 and 0.29 on the twenty shifted boundaries; for mean
   interbuilding distance, adjacency and average weighted distance the
-  within-class gradient on the real line exceeds that of all twenty shifted
-  lines (05).
+  within-class gradient of the favela-labelled buildings (within 10 m of the
+  line against 25-40 m inside it) on the real line exceeds that of all twenty
+  shifted lines, in the attributions and in the raw indicators (05).
 * The transition is present in the raw indicators: e.g. squareness +0.91 IQR
   units (95% site-bootstrap interval +0.50 to +1.51), average weighted distance
   −0.47 (−0.75 to −0.20); the SHAP contrast is positive in all nine evaluable

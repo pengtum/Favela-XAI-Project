@@ -2,12 +2,13 @@
 
 Manuscript items
   * Methods 4.2 and SI Section S1: geometries failing at the tessellation stage
-    (tessellation failure, too small, invalid) are discarded, <0.1% of the
-    geometries of any site (share per site written by 04_site_summary.py).
+    (tessellation failure, too small, or illegal geometries) are discarded
+    (counts and shares per site written by 04_site_summary.py, which prints them
+    next to the figure stated in Methods 4.2: 443 of the 188,735 footprints, 0.23%).
   * The cells are the basis of the tessellation indicators of Methods 4.3 and
-    SI Section S3 (cell area, compactness-weighted axis, number of neighbours,
-    covered area ratio, cell alignment) and of the contiguity graph of the
-    spatial indicators.
+    SI Section S3 (tessellation cell area, compactness-weighted axis of
+    tessellation, tessellation number of neighbours, covered area ratio, cell
+    alignment) and of the contiguity graph of the spatial indicators.
 
 Method (favela_xai.features.tessellate)
   Buildings that are null, invalid, empty, not a single Polygon or smaller than
@@ -23,7 +24,10 @@ Outputs (outputs/main/01_features/)
   <site>_buildings_tessellated.gpkg   kept buildings: uID, source columns, label, geometry
   <site>_tessellation.gpkg            tessellation cells: uID, geometry
   <site>_excluded_buildings.gpkg      excluded buildings with exclusion_reason (only if any)
-  steps/<site>_tessellation.csv       counts per exclusion reason
+  steps/<site>_tessellation.csv       counts per exclusion reason, and the favela-labelled
+                                      buildings among the excluded (favela_excluded; the
+                                      discarded footprints inside the official favela
+                                      boundaries of Methods 4.1) and the kept (favela_kept)
 
 Run from the repository root:
   python main/01_features/02_tessellation.py [--sites palmeras rocinha]

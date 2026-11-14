@@ -11,7 +11,7 @@ tests with site-identity permutations, Benjamini-Hochberg correction).
 |---|---|
 | SI Fig. S11: 10 × 10 transfer balanced-accuracy matrix (rows = training site, columns = target site) | 01 |
 | SI Section S8 and Discussion: mean cross-site balanced accuracy over the 90 ordered pairs 0.574 (site-bootstrap 95% CI 0.529-0.649) against 0.896 within sites; 24 of 90 pairs below chance | 01 |
-| Supplementary Data: accuracy, balanced accuracy and AUC for all 100 pairs | 01 |
+| Table of all 100 ordered pairs (accuracy, balanced accuracy and AUC); its balanced accuracies are the values of SI Fig. S11 | 01 |
 | SI Fig. S12 and SI Section S8: Mantel correlation of transfer with seven between-site measures; similarity of the favela-formal contrast is the strongest (r = 0.59, BH q < 0.001) | 02 |
 | Methods, "Cross-site classifier transferability" | 01, 02 |
 
@@ -20,7 +20,7 @@ tests with site-identity permutations, Benjamini-Hochberg correction).
 From the repository root, after `main/01_features` and `main/02_classification`:
 
 ```bash
-python appendix/S08_transfer/01_transfer_matrix.py      # transfer matrix, site bootstrap, Supplementary Data, SI Fig. S11
+python appendix/S08_transfer/01_transfer_matrix.py      # transfer matrix, site bootstrap, table of all pairs, SI Fig. S11
 python appendix/S08_transfer/02_transfer_similarity.py  # site descriptors, seven measures, Mantel tests and BH q, SI Fig. S12
 ```
 
@@ -42,7 +42,7 @@ The held-out test split of each site is re-derived with
 | File | Content | Script |
 |---|---|---|
 | `transfer_pairwise_metrics.csv` | 100 ordered pairs: target test size, favela test buildings and share, accuracy, balanced accuracy, AUC | 01 |
-| `Supplementary_Data_transfer.csv` | the same table with the Supplementary Data column headers (UTF-8 with BOM) | 01 |
+| `transfer_pairwise_metrics_labelled.csv` | the same table with descriptive column headers (UTF-8 with BOM) | 01 |
 | `transfer_balanced_accuracy_matrix.csv` | 10 × 10 balanced accuracy, full precision (input of 02) | 01 |
 | `transfer_summary.log` | within- and cross-site means, site-bootstrap intervals and ranges; pairs below chance; favela shares; mean transfer by training and target site | 01 |
 | `Figure_R1_transfer_balanced_accuracy.pdf` | SI Fig. S11 | 01 |

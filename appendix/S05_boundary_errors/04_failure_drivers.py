@@ -4,9 +4,9 @@ Manuscript items
 * Supplementary Fig. S3: for each site, the mean Tree-SHAP contribution among
   false positives of the features that rank among the top drivers in any site;
   a black box marks each site's dominant driver.
-* SI S5 text: the dominant driver is site-dependent (adjacency in Rocinha and
-  Catumbi, perimeter wall in Grotao de Costa Barros, mean interbuilding
-  distance in most other sites), with the median interbuilding distance of
+* SI S5 text: the dominant driver is site-dependent (the adjacency ratio in
+  Rocinha and Catumbi, perimeter wall in Grotao de Costa Barros, mean
+  interbuilding distance in most other sites), with the median interbuilding distance of
   false positives and correctly classified formal buildings (for example
   3.1 m versus 4.7 m in Jacarezinho). Written to failure_drivers.csv and
   failure_drivers_numbers.txt.

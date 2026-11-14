@@ -1,11 +1,14 @@
 """Step 4: building counts per site and the pre-processing report.
 
 Manuscript items
-  * Methods 4.1 (also abstract and introduction): 188,735 buildings in the ten
-    sites, 82,015 within official favela boundaries (footprints of the site
-    windows before the tessellation stage; columns in_window, favela_in_window).
+  * Methods 4.1 (also abstract and introduction): building footprints of the ten
+    site windows and those within official favela boundaries, before the
+    tessellation stage (columns in_window, favela_in_window; printed next to the
+    totals stated in Methods 4.1, main_01_features.manuscript_totals), and
+    buildings analysed (column analysed).
   * Methods 4.2 and SI Section S1: geometries discarded at the tessellation
-    stage, <0.1% for any site (column excluded_share_pct).
+    stage (columns tessellation_excluded_total, excluded_share_pct; printed next to
+    the figure stated in Methods 4.2, 443 of the 188,735 footprints, 0.23%).
   * Fig. 1a: per-class building counts and position of each site
     (site_counts.csv, read by 08_figure1_study_area.py).
 
@@ -69,7 +72,7 @@ def main() -> None:
         pre = read_step_table(out_dir, site, "preprocessing", "01_preprocess_footprints.py").iloc[0]
         tes = read_step_table(out_dir, site, "tessellation", "02_tessellation.py").iloc[0]
         row = {"site": site, "name": cfg.site_name(site),
-               "extract_records_stored_analysis": int(cfg.site_info(site)["extract_records"])}
+               "extract_records": int(cfg.site_info(site)["extract_records"])}
         for col in ["read_padded_window", "removed_null_or_empty", "repaired_invalid", "removed_unrepairable",
                     "removed_duplicates", "added_by_singlepart", "removed_final_check", "cleaned_padded_window",
                     "in_window", "favela_in_window"]:
@@ -105,9 +108,9 @@ def main() -> None:
     print(f"footprints in the site windows: {int(t['in_window']):,} ({int(t['favela_in_window']):,} favela); "
           f"Methods 4.1: {stated['buildings']:,} ({stated['favela']:,} favela)")
     print(f"record count of the site extracts: "
-          f"{int(t['extract_records_stored_analysis']):,}")
+          f"{int(t['extract_records']):,}")
     print(f"analysed after the tessellation stage: {int(t['analysed']):,} ({int(t['favela_analysed']):,} favela)")
-    print("share of footprints excluded at the tessellation stage (Methods 4.2: < 0.1% for any site):")
+    print("share of footprints excluded at the tessellation stage (Methods 4.2: 443 of the 188,735 footprints, 0.23%):")
     for r in report.itertuples():
         print(f"  {r.name:24s} {r.tessellation_excluded_total:5d} of {r.in_window:7,d}  ({r.excluded_share_pct:.2f}%)")
 

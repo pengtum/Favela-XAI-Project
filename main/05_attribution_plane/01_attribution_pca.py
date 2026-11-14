@@ -4,8 +4,9 @@ Manuscript items
 * Methods 4.6: each of the 25 attribution columns standardised over the
   buildings of all ten sites, one PCA fitted to the pooled matrix, first two
   components kept.
-* Fig. 5: explained variance of PC1 and PC2 (17.9% and 8.5%, printed at the
-  end of the run); the scores are drawn by 02_figure5.py.
+* Fig. 5: explained variance of PC1 and PC2 (printed at the end of the run;
+  the Fig. 5 caption gives 17.9% and 8.5%); the scores are drawn by
+  02_figure5.py.
 * Results 2.4: within every site the favela and formal-settlement clouds are
   displaced in their centres of mass (per-site class means of PC1 and PC2 in
   persite_summary.csv).

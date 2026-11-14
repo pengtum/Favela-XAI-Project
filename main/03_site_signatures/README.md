@@ -11,7 +11,7 @@ favelas (Rocinha and Barão) differ in space and in their SHAP dependence.
 |---|---|
 | Fig. 3a: dominant feature of every favela building in the eight other sites | 02 |
 | Fig. 3b: Rocinha and Barão, dominant-feature map and Tree-SHAP maps of mean interbuilding distance and squareness, with SHAP-dependence insets | 02 |
-| Results 2.2: importance ranking (mean interbuilding distance and adjacency lead across sites; squareness in Barão; perimeter wall in Grotão de Costa Barros; interbuilding distance and adjacency in Rocinha and Catumbi) | 01 |
+| Results 2.2: importance ranking (mean interbuilding distance and adjacency lead across sites; squareness dominant in Barão; the perimeter wall among the top contributors in Grotão de Costa Barros; interbuilding distance and adjacency leading in Rocinha and Catumbi) | 01 |
 | Results 2.2: reversal of the interbuilding-distance dependence between Barão (toward favela) and Rocinha (toward formal) | 02 |
 | Extended Data Fig. 2: per-site importance for the favela class (values; the figure is drawn by `appendix/S06_attribution_analyses/01_persite_importance.py`) | 01 |
 | SI Section S6, first paragraph: global ranking and secondary tier | 01 |
@@ -48,7 +48,7 @@ python main/03_site_signatures/02_figure3.py             # Fig. 3 and the binned
 
 ## Definitions and settings (`config.yaml`)
 
-- Attributions: exact Tree SHAP (log-odds) of the per-site XGBoost models (Methods 4.4, 4.6).
+- Attributions: exact, path-dependent Tree SHAP (no background sample; log-odds) of the per-site XGBoost models (Methods 4.4, 4.6).
 - Site importance (`importance`): mean \|SHAP\| over the site's favela buildings and its share of the site total; the cross-site order is the mean over the ten sites.
 - Dominant feature (`importance`): the indicator with the largest signed SHAP value toward favela.
 - Fig. 3 layout (`main_03_site_signatures`): panel-b sites and indicators, panel-a order, zoom window, number of colour-coded features, SHAP colour limit (percentile of \|SHAP\|) and inset binning.

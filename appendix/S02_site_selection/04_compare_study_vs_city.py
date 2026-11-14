@@ -55,8 +55,10 @@ from favela_xai.io import write_table, write_text
 
 import s02_lib as L
 
-# Favela names listed for each site in SI Section S2 (cluster composition),
-# used only for the name check written to name_reconciliation_SI_S2.csv.
+# Favela names listed for each site in SI Section S2 (cluster composition), in
+# the spelling of the 2013 polygon layer where it differs ('Faz Quem Quer (RA -
+# Madureira)' is printed 'Faz Quem Quer (Madureira)' in SI S2); used only for the
+# name check written to name_reconciliation_SI_S2.csv.
 SI_S2_NAMES = {
     "grotao_de_costa_barros": ["Associação Comunitária Vila Alvorada", "Cabo Otávio", "Caminho do Job",
                                "Caminho do Padre", "Chico Mendes (Morro do Chapadão)", "Deus é Vida",

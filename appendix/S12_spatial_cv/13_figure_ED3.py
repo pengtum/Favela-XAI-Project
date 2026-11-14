@@ -11,7 +11,7 @@ Manuscript items
   c  site mean of the per-run Spearman rho with the main-text ranking (site-bootstrap 95%
      interval), sites scored / not scored and site-runs keeping all three top features,
      for the references, the 0 m and 200 m block ladders, the favela components and the
-     three alternative 250 m units; null band = split-refit null 95% interval, dashed
+     three alternative 250 m units; null band = split-refit null 95% interval, dotted
      line = random five-fold mean.
 * Caption numbers (ed3_caption_numbers.txt): Catumbi building counts, the share of
   training buildings removed by the buffer in the fold shown and across folds, points

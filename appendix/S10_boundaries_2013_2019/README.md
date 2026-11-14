@@ -33,7 +33,7 @@ python appendix/S10_boundaries_2013_2019/01_boundary_overlay.py   # SI Table S8 
 
 | File | Content |
 |---|---|
-| `overlay_counts.csv` | per site: buildings, the four status counts, buildings whose 2013 status differs from their label (zero by construction), and the same counts under a centroid rule for comparison |
+| `overlay_counts.csv` | per site: buildings, the four status counts, buildings whose 2013 overlay status differs from their label, and the same counts under a centroid rule for comparison |
 | `table_S8_boundary_status_counts.csv` | SI Table S8: rows in the printed order, sum row |
 | `table_R1_cadastre_counts.tex` | SI Table S8 in LaTeX |
 | `overlay_log.txt` | sums, buildings with the same status in both years, sites without change |

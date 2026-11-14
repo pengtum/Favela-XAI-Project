@@ -2,7 +2,8 @@
 
 This repository contains code only. The analysis uses open municipal data of the
 City of Rio de Janeiro, produced by the Instituto Municipal de Urbanismo Pereira
-Passos (IPP) and published on the Data.Rio portal, plus OpenStreetMap streets.
+Passos (IPP) and published on the Data.Rio portal, plus OpenStreetMap streets and a terrain model
+available from IPP on request.
 Download the inputs from the sources below and place them at the paths given.
 These are the defaults of `paths.raw` in `config.yaml`; edit those entries if the
 files are stored elsewhere.
@@ -21,8 +22,10 @@ files are stored elsewhere.
 
 ## Notes
 
-* All layers are used in SIRGAS 2000 / UTM zone 23S (EPSG:31983); the code
-  reprojects any input stored in another CRS.
+* All layers are used in SIRGAS 2000 / UTM zone 23S (EPSG:31983). Vector
+  layers stored in another CRS are reprojected after reading; the 2013
+  footprint layer, which is read by bounding box, and the terrain model must
+  be supplied in EPSG:31983.
 * The ten study sites are rectangular windows of the 2013 footprint layer; their
   coordinates and names are listed under `sites` in `config.yaml`.
 * The 2019 favela polygons were accessed in September 2024, the administrative

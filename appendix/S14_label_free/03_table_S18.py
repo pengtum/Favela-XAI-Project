@@ -2,10 +2,10 @@
 
 Manuscript item: SI Table S18, written as table_S18_label_free.tex. Rows 'All
 indicators equal', 'Dimensions balanced', 'One component per dimension' (means
-over the ten sites of the best result over 2-6 clusters and over k-means and
-Ward: best ARI, best balanced accuracy, score AUC, step in SD; pooled profile
-correlation r) and the 'Supervised (reference)' row (balanced accuracy 0.904,
-AUC 0.969).
+over the ten sites: best ARI and best balanced accuracy over 2-6 clusters and
+over k-means and Ward; score AUC and step in SD of the two-cluster k-means
+score; correlation r of the pooled normalised profiles) and the 'Supervised
+(reference)' row (balanced accuracy 0.904, AUC 0.969).
 
 Supervised reference: five-fold cross-validation of the SI S12 pipeline
 (XGBoost, 100 trees, seed 432); balanced accuracy and AUC are the mean over
@@ -31,11 +31,11 @@ from favela_xai.io import write_table, write_text
 
 CAPTION = (
     r"\textbf{Label-free clustering of the 25 morphological indicators, by weighting scheme.} Means over the ten "
-    r"sites of the best result over 2--6 clusters and over $k$-means and Ward clustering. Score AUC, "
-    r"orientation-free separation of the continuous two-cluster score; step, inside--outside difference of the "
-    r"score in standard deviations; profile $r$, correlation of the normalised boundary profile with that of the "
-    r"supervised favela probability. Supervised reference: five-fold cross-validation of the pipeline of "
-    r"Section~\ref{sec:spatialcv} (XGBoost, 100 trees, seed 432).")
+    r"sites. Adjusted Rand index and balanced accuracy, best result over 2--6 clusters and over $k$-means and Ward "
+    r"clustering. Score AUC, orientation-free separation of the continuous two-cluster ($k$-means) score; step, "
+    r"inside--outside difference of the score in standard deviations; profile $r$, correlation of the pooled "
+    r"normalised boundary profile with that of the supervised favela probability. Supervised reference: five-fold "
+    r"cross-validation of the pipeline of Section~\ref{sec:spatialcv} (XGBoost, 100 trees, seed 432).")
 
 
 def num(v: float) -> str:

@@ -4,9 +4,9 @@ Manuscript items
 * Wilson 95% score intervals per distance bin (Main Methods 4.7; Main Fig. 2c;
   ED Fig. 1; SI Table S4).
 * Site bootstrap: resampling the sites with replacement, 2,000 resamples
-  (Main Fig. 2, ED Fig. 1, SI S5, SI S12 'Scoring'), in two forms: pooled
+  (Results 2.1, ED Fig. 1, SI S5, SI S12 'Scoring'), in two forms: pooled
   rates (buildings pooled within each resample, ED Fig. 1 / SI Table S4) and
-  the mean of site values (SI S12, ED Figs 3-4).
+  the mean of site values (Results 2.1, SI S12, ED Fig. 3).
 * Benjamini-Hochberg adjusted p values (SI S8, seven between-site measures).
 
 Random draws use numpy ``default_rng(seed)`` and

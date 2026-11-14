@@ -8,7 +8,8 @@ Manuscript items
   2,000 buildings per class.
 * Results 2.4: the two classes are displaced with overlap in every site.
   panel_stats.csv gives, for each site, the out-of-fold AUC of a logistic
-  regression on PC1 and PC2 as a numerical summary of each panel.
+  regression on PC1 and PC2 as a descriptive check of each panel; the paper
+  does not report it.
 
 Figure size 183 mm wide; vector output with the point layer rasterised at 600 dpi.
 

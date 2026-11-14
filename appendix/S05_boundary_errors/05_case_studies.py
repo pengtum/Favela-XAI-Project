@@ -113,7 +113,7 @@ def representative(i, w, predfav):
     if i == 0:
         q = w[w.FP]
         return (q.assign(t=q[SHAP_COLUMNS].sum(1)).sort_values("t", ascending=False).iloc[0] if len(q) else None,
-                "false positive (formal settlement)")
+                "false positive (non-favela)")
     if i == 1:
         q = predfav[predfav.driver == "adjacency"]
         q = q if len(q) else predfav
@@ -155,7 +155,7 @@ def main() -> None:
         ax.axis("off")
         panel_letter(ax, L)
     figA.legend(handles=[Patch(fc=COL["favela"], label="favela (ground truth)"),
-                         Patch(fc=COL["formal"], label="formal settlement"),
+                         Patch(fc=COL["formal"], label="non-favela"),
                          Line2D([0], [0], color=COL["fp"], lw=1.3, label="false positive (formal→favela)"),
                          Line2D([0], [0], color=COL["fn"], lw=1.3, label="false negative (favela→formal)")],
                 loc="lower center", ncol=4, fontsize=6.5, bbox_to_anchor=(0.5, -0.015))
@@ -194,7 +194,7 @@ def main() -> None:
     handles = [Patch(fc=DRIVER_COL[d], label=label_of(d)) for d in drivers if d in present]
     if present - set(drivers):
         handles.append(Patch(fc=COL["other"], label="other feature"))
-    handles += [Patch(fc=COL["pred_formal"], label="predicted formal settlement"),
+    handles += [Patch(fc=COL["pred_formal"], label="predicted non-favela"),
                 Line2D([0], [0], color="#272727", lw=.9, ls=":", label="false positive")]
     figB.legend(handles=handles, loc="lower center", ncol=4, fontsize=6.3, bbox_to_anchor=(0.5, -0.008))
     figB.tight_layout(rect=[0, 0.03, 1, 1])

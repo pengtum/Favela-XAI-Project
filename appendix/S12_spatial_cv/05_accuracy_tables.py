@@ -7,7 +7,7 @@ Manuscript items
 * SI Table S13 (folds and sites removed by the scoring) -> tables/table_R1_spatialcv_coverage.tex
 * SI Table S14 (fold-level summary) -> tables/table_R1_spatialcv_folds.tex
 * the values plotted in SI Fig. S19 (scored_grid.csv, scored_designs.csv; drawn by 06)
-* the accuracy values of SI S12, Results 2.1 and Main Methods (in_text_numbers.txt),
+* the accuracy values of SI S12, Results 2.1 and the Discussion (in_text_numbers.txt),
   e.g. balanced accuracy 0.644 (0.582-0.714; nine sites) for 250 m blocks with the
   200 m buffer against 0.898 for the random 80/20 split, the decomposition of that
   decline, the held-out favela component (0.650 / 0.628) and the pooled
@@ -225,7 +225,7 @@ C.write_tex_table(
     "Folds and sites removed by the two scoring criteria. Folds not fitted: no test building, fewer than 50 training "
     "buildings, or a single class in the training set after the buffer. Sites not scored: the sites that the second "
     "criterion removes in that design and buffer (for designs with three grid placements, per placement), listed by "
-    "name; the favela coverage behind each removal, per site and grid placement, is reported in the analysis archive. "
+    "name. "
     "Test buildings scored: share of all test buildings, over all placements, that enter the scored values. Design "
     "cells not listed lose no fold and no site; the matched controls are scored on the same site placements.",
     "tab:spatialcv_coverage", body, cfg, tabular="lrrrrrp{4.5cm}r")
@@ -278,8 +278,7 @@ C.write_tex_table(
     "where sites contribute unequal numbers of folds. \\emph{Median test favela\nprevalence} is the median over the "
     "scored folds of the share of the\nfold's test buildings labelled favela in the official 2013 boundaries; balanced "
     "accuracy is insensitive to it by\nconstruction, and 0.5 is its chance level at any prevalence. "
-    "The record of every individual\nfold, with its own accuracy, AUC, favela-class $F_1$, class prevalence and "
-    "training and test sizes, is released\nwith the code that accompanies this work.",
+    "The individual folds, with their metrics, prevalence and sample sizes, are\nlisted in Supplementary Data~1 and~2.",
     "tab:spatialcv_folds", body, cfg, size="\\small", tabular="@{}lrrrrr@{}")
 
 # ============================================================================ SI Fig. S19 values
@@ -315,7 +314,7 @@ for r in rows_B:
 pd.DataFrame(des).to_csv(OUT / "scored_designs.csv", index=False)
 
 # ============================================================================ SI Table S10: overview of the designs
-Ai = A.set_index(["block_m", "buffer_m"])
+Ai = A[A.block_m.notna()].set_index(["block_m", "buffer_m"])   # unique index: the random references have no block size
 Bi = {(r["key"], r.get("placement"), r["buffer_m"] if np.isfinite(r["buffer_m"]) else None): r for r in rows_B}
 bufs = f"{min(BUFFERS)}--{max(BUFFERS)} ({PRIM_B})"
 sens_bufs = ", ".join(str(int(v)) for v in SCV["sensitivity_buffers_m"]) + f" ({PRIM_B})"
@@ -420,7 +419,7 @@ DEC = pd.DataFrame(dec)
 DEC.to_csv(OUT / "decomposition.csv", index=False)
 
 # ============================================================================ in-text numbers
-Ai = A.set_index(["block_m", "buffer_m"])
+Ai = A[A.block_m.notna()].set_index(["block_m", "buffer_m"])   # unique index: the random references have no block size
 p0, p2 = Ai.loc[(PRIM_L, 0)], Ai.loc[(PRIM_L, PRIM_B)]
 rA = A[A.design == "Random 80/20 split"].iloc[0]
 rF = A[A.design == "Random five-fold"].iloc[0]

@@ -28,14 +28,15 @@ Inputs
 
 Outputs (outputs/appendix/S10_boundaries_2013_2019/)
 * overlay_counts.csv            per site: the four status counts, the number of
-                                buildings, the buildings whose 2013 status differs
-                                from their label (zero by construction, since the
-                                labels use the same rule), and the centroid rule
+                                buildings, the buildings whose 2013 overlay status
+                                differs from their label, and the centroid rule
                                 for comparison only
 * table_S8_boundary_status_counts.csv   SI Table S8 (rows in the printed
                                 order, sum row)
-* table_R1_cadastre_counts.tex  SI Table S8 in LaTeX, with caption and column
-                                headers
+* table_R1_cadastre_counts.tex  SI Table S8 in LaTeX: column headers, rows, sum
+                                row and the definitions part of the caption (the
+                                printed caption adds two sentences that compare
+                                the totals with the counts of Methods 4.1)
 * overlay_log.txt               printed log with the in-text numbers
 
 Run (from the repository root, after main/01_features):
@@ -51,7 +52,8 @@ from favela_xai.labels import FAVELA, inside_polygons, polygon_union
 
 STATUS = ["favela_in_both", "formal_in_both", "added_by_2019", "removed_by_2019"]
 
-# Caption and column headers of SI Table S8.
+# Caption (definitions part) and column headers of SI Table S8; the printed
+# caption adds two sentences that compare the totals with the counts of Methods 4.1.
 CAPTION = (
     r"\caption{Per-site building counts by favela status in the official favela boundaries of 2013 and of 2019," "\n"
     r"  on the 2013 building footprints. A building is counted as inside the boundaries of a given year if its footprint" "\n"

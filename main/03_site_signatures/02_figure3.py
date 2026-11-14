@@ -17,7 +17,12 @@ Manuscript items
   are written to figure3_dependence_curves.csv (the full per-site dependence
   is SI Figs S7-S8, appendix/S06_attribution_analyses).
 
-The SVG output keeps the text editable for final layout.
+The SVG output keeps the text editable for final layout. The published Fig. 3
+was finished by hand from it; for example, the two panel headings, the legend
+title, the 'other feature' and 'non-favela' legend entries and the inset titles
+and key were removed, the two colour bars share the label 'Feature importance',
+the first inset carries the axis labels 'feature value' and 'shap value', and
+Grotão de Costa Barros is labelled 'Grotão' in panel a.
 
 Settings (config.yaml)
 * importance.dominant_feature: argmax of the 25 signed SHAP values.

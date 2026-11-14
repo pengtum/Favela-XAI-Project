@@ -188,7 +188,7 @@ def main() -> None:
                    dS_geom_sign=mg["dS"], maxslope_geom_sign=mg["maxslope"],
                    x0_change_geom_minus_label=mg["x0"] - ml["x0"])
         if t5 is not None:
-            rec.update(x0_table_S5=t5.loc[f, "x0_m"], w_table_S5=t5.loc[f, "w_m"], dS_table_S5=t5.loc[f, "delta_s"])
+            rec.update(x0_table_S5=t5.loc[f, "x0"], w_table_S5=t5.loc[f, "w"], dS_table_S5=t5.loc[f, "delta_s"])
         san.append(rec)
     san = pd.DataFrame(san)
     write_table(san, rc.OUT / "sanity.csv")

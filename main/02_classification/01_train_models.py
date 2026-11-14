@@ -3,11 +3,13 @@
 Manuscript items
   * Methods 4.4: one XGBoost classifier per site on the 25 indicators,
     stratified 80/20 train/test split (seed 42), 200 trees, max depth 6,
-    learning rate 0.1. The test-set predictions give SI Table S3, Fig. 2a,b
-    and the accuracies of Results 2.1 (02_table_S3.py, 06_figure2.py).
-  * Methods 4.6: Tree SHAP of each site's model, an N x 25 attribution
-    ("deep-feature") matrix per site in log-odds (SI Section S7); positive
-    values push a building toward the favela class (Figs 3-4).
+    learning rate 0.1. The test-set predictions give SI Table S3, Fig. 2b
+    and the accuracies of Results 2.1 (02_table_S3.py, 06_figure2.py); the
+    predictions of every building (training and held-out test) give Fig. 2a.
+  * Methods 4.6: path-dependent Tree SHAP (no background sample) of each
+    site's model, an N x 25 attribution ("deep-feature") matrix per site in
+    log-odds (SI Section S7); positive values push a building toward the
+    favela class (Figs 3-4).
   * The per-site tables written here are the input of main/03-05, the
     Extended Data figures and most SI analyses (products.shap_gpkg); the
     models are the classifiers of the cross-site transfer (SI Section S8;

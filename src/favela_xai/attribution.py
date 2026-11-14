@@ -27,10 +27,17 @@ from .features import MODEL_FEATURE_ORDER, SHAP_COLUMNS
 
 
 def tree_shap(model, X, negate: bool = False, model_output: str = "raw") -> np.ndarray:
-    """Exact Tree-SHAP values (log-odds contributions), shape (n buildings, n features)."""
+    """Exact Tree-SHAP values (log-odds contributions), shape (n buildings, n features).
+
+    Path-dependent Tree SHAP (Methods 4.6): no background sample is passed, so
+    shap.TreeExplainer uses feature_perturbation="tree_path_dependent", which
+    weights the two branches of a split on a withheld indicator by the cover
+    recorded in the fitted trees.
+    """
     import shap
 
-    explainer = shap.TreeExplainer(model, model_output=model_output)
+    explainer = shap.TreeExplainer(model, model_output=model_output,
+                                   feature_perturbation="tree_path_dependent")
     values = explainer.shap_values(X)
     if isinstance(values, list):             # older shap versions: one array per class
         values = values[1]

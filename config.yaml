@@ -11,7 +11,7 @@
 # * Comments give the manuscript item that each parameter belongs to:
 #   "Methods" = Methods of the main text, "SI" = Supplementary Information,
 #   "ED" = Extended Data. Main Figs 1-5, ED Figs 1-5, SI Figs S1-S23,
-#   SI Tables S1-S18.
+#   SI Tables S1-S19.
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -85,9 +85,16 @@ products:
 # key: site identifier used in file names; name: display name;
 #   latex: name as typeset in the SI tables.
 # window: rectangular analysis window around the favela of interest,
-#   [xmin, ymin, xmax, ymax] in EPSG:31983.
-# extract_records: number of 2013 footprints in the window (ten sites:
-#   188,735 buildings, Methods 4.1).
+#   [xmin, ymin, xmax, ymax] in EPSG:31983; the site's footprints are those
+#   inside it (preprocessing.window_predicate). The window sizes quoted in
+#   Methods 4.1, SI S2.1 and SI Table S1 are the east-west x north-south
+#   extent of the centroids of the analysed buildings
+#   (appendix/S02_site_selection/06_site_context_table.py), slightly smaller
+#   than this rectangle.
+# extract_records: number of records of the 2013 footprint extract of the
+#   site (ten sites: 188,735 building footprints, Methods 4.1);
+#   01_preprocess_footprints.py and 04_site_summary.py print it together with
+#   the cleaned footprints that a run keeps in the window.
 # The list order (alphabetical by key) is the order used by every loop and by
 # every site bootstrap; do not reorder it.
 # -----------------------------------------------------------------------------
@@ -212,9 +219,10 @@ oof:
   random_state: 432       # Methods 4.7
 
 # -----------------------------------------------------------------------------
-# Tree SHAP (Methods 4.6): exact Tree SHAP of each site's classifier, an
-# N x 25 matrix per site, raw margin (log-odds) output (SI S7); positive values
-# push a building toward the favela class (Main Figs 3 and 4).
+# Tree SHAP (Methods 4.6): exact, path-dependent Tree SHAP (no background
+# sample) of each site's classifier, an N x 25 matrix per site, raw margin
+# (log-odds) output (SI S7); positive values push a building toward the favela
+# class (Main Figs 3 and 4).
 # -----------------------------------------------------------------------------
 shap:
   model_output: raw
@@ -232,8 +240,9 @@ signed_distance:
   # false = edges of the individual 2013 polygons (an edge shared by two
   # adjacent favela polygons counts as boundary); true = boundary of the
   # dissolved union (the interface between favela and non-favela ground).
-  # Used by every boundary analysis (Fig. 2c, ED Fig. 1, SI Table S4, Fig. 4,
-  # SI Table S5, SI S6.1, S13, S14).
+  # Used by every boundary analysis (Fig. 2c, ED Fig. 1, SI Table S4, the
+  # blocked error rates of Results 2.1 and SI S5/S12, Fig. 4, SI Table S5,
+  # SI Fig. S6, SI S6.1, S13, S14, S15 and SI Table S19).
   dissolve_polygons: false
 
 # -----------------------------------------------------------------------------
@@ -417,7 +426,7 @@ spatial_cv:
   scoring:
     min_minority_train: 50         # Methods 4.5 / SI S12: at least 50 training buildings of the minority class
     min_favela_coverage: 0.5       # Methods 4.5 / SI S12: at least half of the site's favela buildings predicted
-    per_grid_placement: true       # coverage rule applied per grid placement
+    per_grid_placement: true       # coverage rule applied per grid placement (set in favela_xai.spatial_cv.apply_rules; this key is not read)
     bootstrap_resamples: 2000      # resamples of the scored sites (SI S12)
     bootstrap_seed: 42
   ranking:
@@ -429,7 +438,7 @@ spatial_cv:
     # an unstratified 80/20 split; model_main = the Methods 4.4 model on a
     # split stratified as in model_main.
     null_classifier: model_cv
-    share_population: favela_buildings    # ED Fig. 3: share of mean |SHAP| over favela buildings
+    share_population: favela_buildings    # ED Fig. 3: share of mean |SHAP| over favela buildings (set in steps 10-11; this key is not read)
     top_k: 3                              # SI Table S16 / ED Fig. 3: three leading indicators
   distances:
     min_test_buildings_per_bin: 200   # SI Fig. S20: at least 200 test buildings per bin ...
@@ -476,8 +485,9 @@ label_free:
   profile_normalise_at_m: 50       # profile = 1 in the favela interior (d <= -50 m), 0 in the formal interior (d >= 50 m)
   supervised_reference: oof        # out-of-fold predictions of the validation pipeline (SI S12, S14)
 
-# Default site bootstrap used where an analysis gives no other setting
-# (Main Fig. 2 and SI S12: 2,000 resamples of the sites).
+# Site bootstrap of Methods 4.7 and SI S12 (2,000 resamples of the sites), for
+# reference only: no script reads this section; boundary_errors and
+# spatial_cv.scoring carry the same values.
 site_bootstrap:
   resamples: 2000
   seed: 42
@@ -541,7 +551,7 @@ main_05_attribution_plane:
   kde_bandwidth_clip: [0.05, 2.0]
   kde_min_points: 30
   # Out-of-fold AUC of a logistic regression on PC1 and PC2 within each site
-  # (written to panel_stats.csv).
+  # (written to panel_stats.csv; a descriptive check, not reported in the paper).
   panel_auc: {n_folds: 5, shuffle: true, seed: 42, max_iter: 1000}
   # Colour of each site's panel in Main Fig. 5 (layout only).
   site_colours:
@@ -609,9 +619,11 @@ appendix_S11_terrain:
 # section holds what only this folder uses.
 # -----------------------------------------------------------------------------
 main_01_features:
-  # Attributes of the 2013 footprint layer carried into every per-site table so
-  # that each building can be traced back to the municipal layer.
-  keep_source_columns: [cod_unico, Tipo]
+  # Attributes of the 2013 footprint layer carried into the per-site building
+  # tables of this folder: cod_unico and Tipo trace each building back to the
+  # municipal layer; ALTURA, the recorded height (m), gives the heights of SI
+  # Section S6 (appendix/S06_attribution_analyses/07_recorded_heights.py).
+  keep_source_columns: [cod_unico, Tipo, ALTURA]
   # Building totals of Methods 4.1 (footprints of the ten site windows before
   # the tessellation stage); 04_site_summary.py prints them next to the
   # computed counts.
@@ -817,7 +829,7 @@ appendix_S09_block_complexity_k:
   # momepy.Tessellation parameters
   tessellation_shrink: 0.4
   tessellation_segment: 0.5
-  # SI Table S6 'Feature-Basic' PCA seed
+  # PCA seed of the 'PC1 + PC2' row of SI Table S6
   feature_basic_pca_seed: 42
   # Per-site accuracy / AUC rounded to 3 decimals before averaging; s.d.
   # across sites (SI Table S6) and across folds (SI Table S7) with ddof 0.
@@ -883,10 +895,12 @@ appendix_S14_label_free:
   score_clusters: 2
   # Supervised reference (SI S14; SI Table S18: five-fold cross-validation of
   # the pipeline of SI S12): rows of this design in products.spatial_cv_folds
-  # (per-site balanced accuracy, SI Fig. S23b) ...
+  # (balanced accuracy and AUC of SI Table S18; per-site balanced accuracy,
+  # SI Fig. S23b) ...
   supervised_folds_design: random_skf5
   # ... and the out-of-fold favela probability in products.oof_predictions
-  # (AUC and boundary profile); the first column name found is used.
+  # (boundary profile, SI Fig. S23a; its AUC is written for information only);
+  # the first column name found is used.
   oof_probability_columns: [prob, oof_prob, prob_favela, p_favela]
   # Row names of SI Table S18
   weighting_names:
@@ -924,8 +938,8 @@ appendix_S02_site_selection:
   polygon_code_field: cod_favela
   polygon_name_field: nome
   # SI S2.1 distance to the city centre weighted by polygon area:
-  # median | mean.
-  area_weighted_statistic: median
+  # mean (the values reported in SI S2.1) | median.
+  area_weighted_statistic: mean
   # SI Table S1 (CSV only): share of a site's buildings inside the convex hull of
   # its favela polygons, with this tolerance.
   polygon_hull_tolerance_m: 1.0
@@ -962,7 +976,7 @@ appendix_S05_boundary_errors:
     polygon_lw: 0.5                # 2013 polygon outline in the assembled figure (layout)
     polygon_lw_single: 1.0         # the same in the single-site maps (layout)
     raster_dpi: 600                # building polygons are rasterised inside the vector PDF
-    legend: true
+    legend: false                  # the published Fig. S2 has no legend (colours in its caption)
   failure_drivers_figure:
     # SI Fig. S3 (SI S5): Tree-SHAP attributions of the false positives
     # (non-favela buildings assigned to the favela class) over

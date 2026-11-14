@@ -11,9 +11,9 @@ Manuscript items
 * SI Section S6: x0 = +4.7 m (mean interbuilding distance), +4.2 m
   (adjacency), +4.9 m (perimeter wall), +3.0 m (squareness), widths of about
   16-18 m, average weighted distance changing sign about 6 m inside.
-* Results 2.3: the leading spatial-distribution indicators change sign a few
-  metres outside the polygon over a graded transition with narrow cross-site
-  bands.
+* Results 2.3: the signature shifts gradually across the boundary; the
+  transition is led by the spatial-distribution indicators, which change sign a
+  few metres outside the polygon.
 
 Definitions (config.yaml, sections 'signed_distance' and 'boundary_profiles')
 * Signed distance: Euclidean distance from the building centroid to the nearest
@@ -48,7 +48,8 @@ Outputs (outputs/main/04_boundary_profiles/)
   profiles_crosssite.csv   indicator x bin: cross-site mean, s.d., number of sites
   transition_metrics.csv   indicator: panel order, pooled mean |SHAP|, dS, |dS|,
                            x0 (m), w (m), resolved (products.transition_metrics;
-                           also read by appendix/S06_attribution_analyses)
+                           also read by appendix/S13_boundary_robustness steps
+                           05 and 08 for their consistency checks)
 
 Run (from the repository root)
   python main/04_boundary_profiles/01_boundary_profiles.py

@@ -2,7 +2,7 @@
 
 Applies the main per-site model of each site, without refitting, to the
 held-out test split of every site and scores balanced accuracy, accuracy and
-AUC. Produces SI Fig. S11, the Supplementary Data table of all 100 pairs and
+AUC. Produces SI Fig. S11, a table of all 100 pairs and
 the transfer values of SI Section S8, the Discussion and the Methods
 ('Cross-site classifier transferability'): within- and cross-site mean
 balanced accuracy, site-bootstrap 95% confidence interval, range, pairs below
@@ -33,8 +33,8 @@ Inputs
 Outputs (outputs/appendix/S08_transfer/)
 * transfer_pairwise_metrics.csv    100 pairs: accuracy, balanced accuracy, AUC,
                                    target test size and favela share
-* Supplementary_Data_transfer.csv  the same table with the column headers of the
-                                   released Supplementary Data (UTF-8 with BOM)
+* transfer_pairwise_metrics_labelled.csv  the same table with descriptive column
+                                   headers (UTF-8 with BOM)
 * transfer_balanced_accuracy_matrix.csv   10 x 10 balanced accuracy, full
                                    precision, site keys (read by 02_transfer_similarity.py)
 * transfer_summary.log             within- and cross-site means, bootstrap interval,
@@ -67,8 +67,8 @@ from favela_xai.model import main_split  # noqa: E402
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
-# Column headers of the released Supplementary Data file (same order as the
-# machine-readable table).
+# Descriptive column headers of transfer_pairwise_metrics_labelled.csv (same
+# order as the machine-readable table).
 SUPPLEMENTARY_HEADERS = {
     "training_site": "Training site",
     "target_site": "Target site",
@@ -305,7 +305,7 @@ def main() -> None:
                              auc=round(AUC[i, j], 4)))
     pairs = pd.DataFrame(rows)
     write_table(pairs, out / "transfer_pairwise_metrics.csv")
-    pairs.rename(columns=SUPPLEMENTARY_HEADERS).to_csv(out / "Supplementary_Data_transfer.csv",
+    pairs.rename(columns=SUPPLEMENTARY_HEADERS).to_csv(out / "transfer_pairwise_metrics_labelled.csv",
                                                       index=False, encoding="utf-8-sig")
     matrix = pd.DataFrame(BAL, index=pd.Index(sites, name="training_site"), columns=sites)
     write_table(matrix, out / "transfer_balanced_accuracy_matrix.csv", index=True)

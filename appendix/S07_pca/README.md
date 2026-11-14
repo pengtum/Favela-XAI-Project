@@ -11,7 +11,7 @@ and maps the buildings above the threshold ("favela-like").
 |---|---|
 | SI Section S7, second paragraph: per-site ROC-Youden thresholds of PC1; the threshold ordering follows the official polygon at most sites, the weakest agreement being Nova Cidade; favela-like buildings are also found beyond the polygon | 01 |
 | SI Fig. S10: favela-like buildings in seven representative sites | 02 |
-| Results 2.4: buildings immediately outside the polygon share the PC1 range of their favela neighbours | 01 (`share_favela_like_outside`, AUC, J) |
+| Results 2.4: buildings immediately outside the polygon often share the PC1 range of their favela neighbours (maps of SI Fig. S10) | 01 (per-site thresholds and favela-like flags), 02 (maps) |
 
 Computed elsewhere: the PCA itself (Methods 4.6, Fig. 5) in
 `main/05_attribution_plane/01_attribution_pca.py`; the raw-indicator benchmark

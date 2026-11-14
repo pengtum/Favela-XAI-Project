@@ -22,8 +22,9 @@ SI S14 'Design'; settings ``label_free``)
 * Per site, the 25 indicators are median-imputed and rank-transformed to a
   standard normal distribution; buildings are clustered into 2-6 clusters by
   k-means and by Ward (fitted on at most 4,000 randomly drawn buildings, the
-  rest assigned to the nearest centroid). Labels are used only to score and to
-  orient the result.
+  rest assigned to the nearest centroid; as in label_free_common.cluster, the
+  buildings of the subsample are assigned to their nearest Ward centroid as
+  well). Labels are used only to score and to orient the result.
 * Alignment: adjusted Rand index, normalised mutual information, accuracy and
   balanced accuracy of the majority assignment, and the best balanced accuracy
   over assignments of clusters to classes.

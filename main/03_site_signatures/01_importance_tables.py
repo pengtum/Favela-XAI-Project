@@ -2,9 +2,9 @@
 
 Manuscript items
 * Results 2.2: cross-site importance ranking (mean interbuilding distance and
-  adjacency lead) and the per-site leaders (squareness in Barão, perimeter wall
-  in Grotão de Costa Barros, interbuilding distance and adjacency in Rocinha
-  and Catumbi).
+  adjacency lead) and the per-site rankings (squareness dominant in Barão, the
+  perimeter wall among the top contributors in Grotão de Costa Barros,
+  interbuilding distance and adjacency leading in Rocinha and Catumbi).
 * Extended Data Fig. 2: values behind the per-site importance for the favela
   class, with one shared indicator order (the cross-site mean). The same shares
   are the importance measure of Extended Data Figs 3-4 and SI Table S16.

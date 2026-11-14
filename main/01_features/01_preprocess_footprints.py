@@ -6,8 +6,8 @@ Manuscript items
     singlepart, Douglas-Peucker simplification (tolerance 0.1 m), second
     validity check (favela_xai.features.preprocess_footprints).
   * Methods 4.1 (study area): the ten site windows and the favela /
-    formal-settlement labels. The totals (188,735 buildings, 82,015 within
-    official favela boundaries) are reported by 04_site_summary.py.
+    formal-settlement labels. The totals of
+    Methods 4.1 are reported by 04_site_summary.py.
 
 Inputs (config.yaml)
   paths.raw.buildings_2013   building footprints 2013 (Data.Rio), all Tipo classes

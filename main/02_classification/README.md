@@ -13,11 +13,11 @@ neighbourhoods withheld.
 |---|---|
 | Methods 4.4: per-site XGBoost (200 trees, max depth 6, learning rate 0.1), stratified 80/20 split, seed 42 | 01 |
 | Methods 4.6: Tree SHAP, one N × 25 attribution matrix per site (input of main/03-05, the Extended Data figures and most SI analyses) | 01 |
-| SI Table S3, SI Section S4, Results 2.1: per-site test performance; mean accuracy 93.3%, per-site F1 0.79-0.98 | 02 |
+| SI Table S3, SI Section S4, Results 2.1: per-site test performance; mean accuracy over the ten sites, range of the per-site F1 | 02 |
 | Methods 4.7: out-of-fold predictions (stratified five-fold, XGBoost 100 trees, seed 432) | 03 |
 | Results 2.1, SI Section S5, SI Table S4, Extended Data Fig. 1: 26.8% misclassified within 6 m of the boundary against 3.7% at 90 m or more (ratio 7.2, 95% CI 3.9-19.7), near > far in all ten sites | 04 |
 | Results 2.1, SI Sections S5 and S12: with 250 m blocks and a 200 m buffer, 51.3% against 15.4% (ratio 3.3, 2.0-6.6), near > far in all nine scored sites | 05 |
-| Fig. 2: (a) outcome maps of Faz Quem Quer and Morro da Guaíba, (b) per-site test accuracy (mean 0.933), (c) misclassification rate in 6 m signed-distance bins | 06 |
+| Fig. 2: (a) outcome maps of Faz Quem Quer and Morro da Guaíba, (b) per-site test accuracy and the ten-site mean, (c) misclassification rate in 6 m signed-distance bins | 06 |
 
 SI Table S4 and Extended Data Fig. 1 are laid out from the tables of step 04
 in `appendix/S05_boundary_errors`.
