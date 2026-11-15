@@ -119,7 +119,7 @@ def main() -> None:
     ax.set_xlabel("signed distance to boundary  (m;  $<0$ inside,  $>0$ outside)", fontsize=8)
     ax.set_ylabel("P(building classified favela)", fontsize=8)
     ax.legend(fontsize=7, loc="center right")
-    fig.tight_layout()
+    fig.tight_layout(rect=[0, 0, 1, 0.967])          # top band kept free (SI Fig. S6 proportions; title in the caption)
     save_pdf(fig, out / FIGURE)
     plt.close(fig)
     print(f"[saved] {out / TABLE}\n[saved] {out / FIGURE}")

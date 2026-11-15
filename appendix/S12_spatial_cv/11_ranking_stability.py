@@ -2,10 +2,13 @@
 
 Manuscript items
 * SI Table S16 -> tables/table_R1_ranking_stability.tex, including the three
-  alternative-unit rows of the 200 m group.
+  alternative-unit rows of the 200 m group, and, when the output of
+  16_classifier_settings.py exists (products.classifier_settings_by_site), the rows
+  'Classifier settings' with their caption sentence (also written alone to
+  tables/table_R1_ranking_stability_settings_rows.tex).
 * The ranking values of SI S12 'Stability of the attributions' and Results 2.2
-  (in_text_numbers.txt): Spearman rho with the main-text ranking 0.874, 0.902 and 0.864
-  for 250, 500 and 1,000 m blocks with the 200 m buffer, against 0.910 for the
+  (in_text_numbers.txt): Spearman rho with the main-text ranking 0.871, 0.901 and 0.854
+  for 250, 500 and 1,000 m blocks with the 200 m buffer, against 0.924 for the
   split-refit null; top three kept; the ladder (no buffer, size-matched control,
   buffer); site-matched contrasts; the three alternative units.
 * Inputs of Extended Data Fig. 3 (panels b, c) and Extended Data Fig. 4: ranking_summary.csv,
@@ -26,8 +29,11 @@ including at least one favela building. Ladder (SI S12): 250 m blocks without bu
 folds where both the buffered and the control fit pass the first criterion and on the
 site-runs scored in both.
 
-Inputs  outputs/appendix/S12_spatial_cv/shap_fold_sums/ (step 10); site tables (step 01)
+Inputs  outputs/appendix/S12_spatial_cv/shap_fold_sums/ (step 10); site tables (step 01);
+        optional: classifier_settings/settings_by_site.csv (step 16)
 Outputs outputs/appendix/S12_spatial_cv/tables/table_R1_ranking_stability.tex
+        (with step 16: tables/table_R1_ranking_stability_settings_rows.tex,
+        ranking/ranking_summary_classifier_settings.csv)
         outputs/appendix/S12_spatial_cv/ranking/ ranking_by_run.csv, ranking_vectors.parquet,
           ranking_summary.csv, ranking_cells.csv, ranking_long.csv, ranking_ladder.csv,
           ranking_ladder_steps.csv, site_matched.csv, in_text_numbers.txt
@@ -142,6 +148,7 @@ for name in RK["alternative_unit_designs"]:
     kind = "hex" if name.startswith("hex") else "kmm" if name.startswith("kmm") else "sq"
     L = name[len(kind):].split("_")[0]
     G.append(("b200", f"{name}_b{ALTB}", ALT_LAB[kind].format(L=L, B=ALTB), [f"{name}_b{ALTB}"]))
+ALT_GIDS = {f"{name}_b{ALTB}" for name in RK["alternative_unit_designs"]}   # labels written in TeX already (ALT_LAB)
 G.append(("stress", f"sq{SMALL}_b{PRIM_B}", f"{lab(SMALL)} + {PRIM_B} m", blk(SMALL, PRIM_B)))
 G += [("stress", f"sq{L}_b{MAXB}", f"{lab(L)} + {MAXB} m", blk(L, MAXB)) for L in FB]
 GD = {g[1]: g for g in G}
@@ -203,8 +210,63 @@ def cnt(a, b):
     return f"{int(a)}/{int(b)}" if b else "--"
 
 
+def tex_row(r) -> str:
+    """One row of SI Table S16 from a row of ranking_summary.csv (or of the rows 'Classifier settings')."""
+    cov = ("--" if not np.isfinite(r.coverage_mean) else "100\\%" if r.coverage_min == 1 else
+           f"{100 * r.coverage_mean:.0f}\\% ({100 * r.coverage_min:.0f}--{100 * r.coverage_max:.0f})")
+    fc = "--" if not np.isfinite(r.first_rho) else f"{r.first_rho:.3f} ({int(r.first_sites)}/{int(r.first_site_runs)})"
+    label = r.label if r.design in ALT_GIDS else r.label.replace(",", "{,}")   # {,}: thousands and settings labels
+    return (f"{label} & {int(r.final_sites)} & {cnt(r.final_site_runs, r.site_runs_with_prediction)} & "
+            f"{ci(r, 'final')} & {dci(r)} & {cov} & {cnt(r.final_top3_two_plus, r.final_site_runs)} & "
+            f"{cnt(r.final_top3_all, r.final_site_runs)} & {fc} & "
+            f"{cnt(r.first_top3_two_plus, r.first_site_runs)} \\\\")
+
+
+# ---------------------------------------------------------------------------- rows 'Classifier settings' (step 16)
+def settings_summary() -> pd.DataFrame:
+    """Rows 'Classifier settings' of SI Table S16 from 16_classifier_settings.py (empty when its output is absent).
+
+    Each variant refits the main per-site model of every site and explains every building, so all
+    favela buildings are covered and both criteria hold; rho, rho minus null and the top three are
+    formed from the per-site values as for the design rows (one run per site).
+    """
+    path = cfg.product("classifier_settings_by_site")
+    if not path.exists():
+        return pd.DataFrame()
+    Q = pd.read_csv(path)
+    # the reference rows must carry the current model_main settings (else the file is stale)
+    ref = Q[Q.is_reference.astype(bool)]
+    mm = cfg.section("model_main")
+    keys = ["n_estimators", "max_depth", "learning_rate", "stratify", "split_random_state"]
+    keys += ["random_state"] if "random_state" in Q.columns else []
+    if not len(ref) or any(ref[k].iloc[0] != mm[k] for k in keys):
+        raise SystemExit(f"{path}: computed for other model_main settings; re-run 16_classifier_settings.py")
+    Q = Q[~Q.is_reference.astype(bool)]
+    rows = []
+    for key, x in Q.groupby("variant", sort=False):
+        ps = x.groupby("site")[["rho", "top3_overlap"]].mean()
+        r = dict(group="settings", design=f"settings_{key}", label=x.label.iloc[0], runs=key, placements_or_seeds=1)
+        for v in ("final", "first"):
+            m, lo, hi, n = C.boot_mean(ps.rho.to_numpy(), s)
+            nul = site_mean(version(v)[version(v).run.isin(NULL)])
+            dm, dlo, dhi, _ = C.boot_mean((ps.rho - nul.reindex(ps.index)).to_numpy(), s)
+            r.update({f"{v}_sites": n, f"{v}_site_runs": len(x), f"{v}_rho": m, f"{v}_rho_lo": lo, f"{v}_rho_hi": hi,
+                      f"{v}_rho_minus_null": dm, f"{v}_rho_minus_null_lo": dlo, f"{v}_rho_minus_null_hi": dhi,
+                      f"{v}_top3_two_plus": two_plus(x), f"{v}_top3_all": int((x.top3_overlap == 1).sum()),
+                      f"{v}_sites_list": ";".join(ps.index[np.isfinite(ps.rho)])})
+        r.update(site_runs_with_prediction=len(x), coverage_mean=float(x.coverage.mean()),
+                 coverage_min=float(x.coverage.min()), coverage_max=float(x.coverage.max()))
+        rows.append(r)
+    return pd.DataFrame(rows)
+
+
+TS = settings_summary()
+if len(TS):
+    TS.to_csv(OUT / "ranking_summary_classifier_settings.csv", index=False)
+
 GL = {"ref": "References (no spatial separation)", "b0": "Spatial blocks and held-out components, no buffer",
-      "b200": f"{PRIM_B} m buffer", "stress": "Stress tests"}
+      "b200": f"{PRIM_B} m buffer", "stress": "Stress tests",
+      "settings": "Classifier settings (main per-site model refitted; no spatial separation)"}
 body = ["\\toprule", " & \\multicolumn{7}{c}{Both criteria} & \\multicolumn{2}{c}{First criterion only} \\\\",
         "\\cmidrule(lr){2-8}\\cmidrule(lr){9-10}",
         "Design & Sites & Site-runs scored & $\\rho$ & $\\rho$ minus null & Coverage & Top three: $\\geq$2 kept & all 3 kept & $\\rho$ (sites/site-runs) & Top three: $\\geq$2 kept \\\\",
@@ -212,14 +274,13 @@ body = ["\\toprule", " & \\multicolumn{7}{c}{Both criteria} & \\multicolumn{2}{c
 for grp in ("ref", "b0", "b200", "stress"):
     body.append(f"\\multicolumn{{10}}{{l}}{{\\textit{{{GL[grp]}}}}} \\\\")
     for _, r in T[T.group == grp].iterrows():
-        cov = ("--" if not np.isfinite(r.coverage_mean) else "100\\%" if r.coverage_min == 1 else
-               f"{100 * r.coverage_mean:.0f}\\% ({100 * r.coverage_min:.0f}--{100 * r.coverage_max:.0f})")
-        fc = "--" if not np.isfinite(r.first_rho) else f"{r.first_rho:.3f} ({int(r.first_sites)}/{int(r.first_site_runs)})"
-        body.append(f"{r.label.replace(',', '{,}')} & {int(r.final_sites)} & {cnt(r.final_site_runs, r.site_runs_with_prediction)} & "
-                    f"{ci(r, 'final')} & {dci(r)} & {cov} & {cnt(r.final_top3_two_plus, r.final_site_runs)} & "
-                    f"{cnt(r.final_top3_all, r.final_site_runs)} & {fc} & "
-                    f"{cnt(r.first_top3_two_plus, r.first_site_runs)} \\\\")
+        body.append(tex_row(r))
     body.append("\\addlinespace")
+SETTINGS_LINES = []
+if len(TS):
+    SETTINGS_LINES = ([f"\\multicolumn{{10}}{{l}}{{\\textit{{{GL['settings']}}}}} \\\\"]
+                      + [tex_row(r) for _, r in TS.iterrows()] + ["\\addlinespace"])
+body += SETTINGS_LINES
 body.append("\\bottomrule")
 # runs with a prediction but no ranking under the first criterion (SI Table S16 caption)
 ALT_DESC = {f"{name}_b{ALTB}": ("hexagonal units" if name.startswith("hex") else "$k$-means units"
@@ -233,7 +294,8 @@ nr_txt = "".join(f" With {desc} {cfg.site_name(site)} has no ranking even under 
                  "criterion leaves it no covered favela building, so it is counted among the site-runs with a prediction "
                  "and excluded from $\\rho$ and the top-three counts." for desc, site in nr)
 seeds = [str(int(v)) for v in SR["null_split_seeds"]]
-cap = ("Stability of the site-level feature rankings under spatial cross-validation. $\\rho$: Spearman correlation with "
+cap = ("Stability of the site-level feature rankings under spatial cross-validation"
+       + (" and alternative classifier settings" if len(TS) else "") + ". $\\rho$: Spearman correlation with "
        "the main-text model's ranking on the same buildings, mean over the site's runs (grid placements or seeds), then "
        "over sites, with a site-bootstrap 95\\% interval; $\\rho$ minus null: paired difference from the split-refit null "
        "over the same sites. Top three: site-runs keeping at least two, or all three, of the main-text model's three "
@@ -247,6 +309,20 @@ cap = ("Stability of the site-level feature rankings under spatial cross-validat
        f"three placements.{nr_txt} Stress tests (first grid placement): {SMALL} m blocks are smaller than the {PRIM_B} m "
        f"indicator neighbourhood, and a {MAXB} m buffer is twice that neighbourhood; neither is used for the main "
        f"conclusions. The split-refit null uses split seeds {', '.join(seeds[:-1])} and {seeds[-1]}.")
+if len(TS):
+    MM = cfg.section("model_main")
+    SETTINGS_CAPTION = (
+        "Classifier settings: the per-site models of Section~\\ref{sec:per_site} refitted with the settings shown and all "
+        f"others as in the main analysis ({MM['n_estimators']} trees, maximum depth {MM['max_depth']}, learning rate "
+        f"{MM['learning_rate']}, {'stratified' if MM['stratify'] else 'unstratified'} "
+        f"{100 * (1 - MM['test_size']):.0f}/{100 * MM['test_size']:.0f} split with seed {MM['split_random_state']}), with "
+        "Tree SHAP of every building, so coverage is 100\\%.")
+    cap += " " + SETTINGS_CAPTION
+    (P.tables / "table_R1_ranking_stability_settings_rows.tex").write_text(
+        "\n".join(["% rows 'Classifier settings' of SI Table S16 (tab:ranking_stability), appended before \\bottomrule by",
+                    "% appendix/S12_spatial_cv/11_ranking_stability.py from products.classifier_settings_by_site",
+                    "% (appendix/S12_spatial_cv/16_classifier_settings.py); sentence appended to the caption:",
+                    "% " + SETTINGS_CAPTION, *SETTINGS_LINES, ""]), encoding="utf-8")
 C.write_tex_table(P.tables / "table_R1_ranking_stability.tex", "11_ranking_stability.py", cap, "tab:ranking_stability",
                   body, cfg, tabular="lrrlllrrll")
 
@@ -378,23 +454,23 @@ for L in FB[1:]:
                  f"{int(r.final_site_runs)}")
 r = Ti.loc["null_3splits"]
 lines.append(f"split-refit null: rho {r.final_rho:.3f} ({r.final_rho_lo:.3f}-{r.final_rho_hi:.3f})")
-lines.append("(manuscript: 0.874 (0.837-0.910), 0.902 (0.862-0.937), 0.864 (0.798-0.920); null 0.910 (0.881-0.937); "
-             "250 m minus null -0.037 (-0.064 to -0.012); 27/27, 27/27, 22/22)")
+lines.append("(manuscript: 0.871 (0.836-0.904), 0.901 (0.858-0.936), 0.854 (0.782-0.919); null 0.924 (0.903-0.943); "
+             "250 m minus null -0.052 (-0.078 to -0.027); 27/27, 27/27, 22/22)")
 if len(LD):
     Lr = pd.DataFrame(ladder_rows)
     Lb = Lr[Lr.scoring == "both criteria"].set_index("step")
     lines.append("ladder: " + " -> ".join(f"{Lb.loc[LAB[k], 'rho']:.3f}" for k in ("b0", "control", "buffered"))
-                 + f" over {int(Lb.loc[LAB['buffered'], 'sites'])} sites (manuscript 0.946 -> 0.905 -> 0.874)")
+                 + f" over {int(Lb.loc[LAB['buffered'], 'sites'])} sites (manuscript 0.947 -> 0.904 -> 0.871)")
     q = LS[LS.scoring == "both criteria"].set_index("difference")
     lines.append(f"control minus null {q.loc['control minus null', 'rho_difference']:+.3f} "
                  f"({q.loc['control minus null', 'ci_lo']:+.3f} to {q.loc['control minus null', 'ci_hi']:+.3f}); buffer "
                  f"minus control {q.loc['buffered minus control', 'rho_difference']:+.3f} "
                  f"({q.loc['buffered minus control', 'ci_lo']:+.3f} to {q.loc['buffered minus control', 'ci_hi']:+.3f}) "
-                 "(manuscript -0.006; the buffer costs a further 0.031 (0.018-0.041))")
+                 "(manuscript -0.018 (-0.032 to -0.007); the buffer costs a further 0.033 (0.010-0.055))")
 for r in SM.itertuples():
     lines.append(f"site-matched {r.no_buffer} -> {r.buffer}: {r.rho_no_buffer:.3f} -> {r.rho_buffer:.3f} over "
                  f"{r.common_sites} common sites")
-lines.append("(manuscript: 0.950 -> 0.874 and 0.937 -> 0.902 over nine sites; 0.895 -> 0.886 over seven; 0.884 -> 0.858)")
+lines.append("(manuscript: 0.943 -> 0.871 and 0.949 -> 0.901 over nine sites; 0.874 -> 0.885 over seven; 0.884 -> 0.846)")
 for name in RK["alternative_unit_designs"]:
     gid = f"{name}_b{ALTB}"
     r = Ti.loc[gid]
@@ -404,11 +480,11 @@ for name in RK["alternative_unit_designs"]:
                  f"{r.final_rho_minus_null_hi:+.3f}); top three >= 2 kept {int(r.final_top3_two_plus)}/"
                  f"{int(r.final_site_runs)}; not scored: "
                  + (", ".join(f"{cfg.site_name(x.site)} ({100 * x.coverage:.0f}%)" for x in pal.itertuples()) or "none"))
-lines.append("(manuscript: 0.887 (0.836-0.927), 0.862 (0.809-0.908), 0.926 (0.896-0.955); ten folds minus null +0.015 "
-             "(-0.014 to +0.037); Palmeiras 8, 0 and 29%)")
+lines.append("(manuscript: 0.882 (0.859-0.905), 0.856 (0.811-0.901), 0.927 (0.888-0.959); ten folds minus null +0.004 "
+             "(-0.027 to +0.027); Palmeiras 8, 0 and 29%)")
 b_sites = [Ti.loc[f"sq{L}_b{PRIM_B}" + ("_3place" if (L, PRIM_B) in TP else "")].final_rho for L in FB[1:]]
 lines.append(f"Results 2.2: site mean rho across block sizes {min(b_sites):.2f}-{max(b_sites):.2f} against "
-             f"{Ti.loc['null_3splits'].final_rho:.2f} (manuscript 0.86-0.90 against 0.91)")
+             f"{Ti.loc['null_3splits'].final_rho:.2f} (manuscript 0.85-0.90 against 0.92)")
 (OUT / "in_text_numbers.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
 for ln in lines:
     log(ln)

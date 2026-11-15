@@ -3,17 +3,18 @@
 Tests whether the building-scale morphological signal is a proxy for terrain:
 per-building elevation and slope from a 5 m digital terrain model, a
 terrain-only classifier, a combined morphology + terrain classifier, and the
-overlap of the favela and non-favela terrain distributions. Main result (SI
-S11, Results): building morphology is the primary signal; terrain alone
-classifies less accurately, adds little when combined with the 25 indicators,
-and neither the slope gap nor the terrain overlap explains the per-site spread
-in accuracy.
+overlap of the favela and non-favela terrain distributions. The scripts compute
+the per-site test accuracy of the three classifiers (Morph: 25 indicators;
+Terrain: nine terrain features; Combined: both), the Tree-SHAP feature
+importance of the Terrain and Combined classifiers, and the Spearman
+correlations of the per-site slope gap and terrain overlap with per-site
+accuracy. The results are reported in Supplementary Section S11.
 
 ## Manuscript items
 
 | Item | Script |
 |---|---|
-| Methods 4.10 "Terrain ablation"; Results paragraph on terrain (terrain-only mean accuracy, gains of the combined classifier) | 02, 06 |
+| Methods 4.10 "Terrain ablation"; Results paragraph on terrain (terrain-only mean accuracy; accuracy difference between the Combined and Morph classifiers) | 02, 06 |
 | SI Table S9: Morph / Terrain / Combined accuracy per site, and the in-text numbers of SI S11 | 06 |
 | SI Fig. S14: slope gap vs per-site accuracy (Experiment 1) | 03 |
 | SI Fig. S15: terrain distribution overlap (OVL) vs accuracy | 04 |
@@ -71,7 +72,7 @@ Accuracies in the tables are fractions (0-1); the figures draw percentages.
 - Tree SHAP: exact Tree SHAP (log-odds) on the test buildings; mean \|SHAP\| per site, then the mean over sites.
 - Slope gap: \|mean slope of favela buildings - mean slope of non-favela buildings\| over all buildings of the site.
 - OVL: integral of min(f_favela, f_non-favela) of Gaussian kernel-density estimates of mean slope and mean elevation.
-- `terrain.classifier`: `model_main` (XGBoost with the Methods 4.4 settings and split) | `model_cv` (XGBoost, 100 trees, seed 432, unstratified 80/20 split with seed 432).
+- `terrain.classifier`: `model_main` (the main per-site model of Methods 4.4: same settings, split, training-row order and class coding as `main/02_classification`, so the Morph column of SI Table S9 equals SI Table S3) | `model_cv` (XGBoost, 100 trees, seed 432, intercept of `model_cv.base_score`, unstratified 80/20 split with seed 432).
 - `appendix_S11_terrain.ovl_population`: `all_buildings` | `test_set` (buildings used for the OVL).
 - `appendix_S11_terrain.figure_accuracy`: `table_S3` | `ablation_morph` (accuracy drawn in Figs S14-S15).
 - `appendix_S11_terrain.morph_feature_labels`: `keys` | `table_S2` (tick labels of the indicators in Fig. S18).

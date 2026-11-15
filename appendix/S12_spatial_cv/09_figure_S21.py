@@ -10,8 +10,8 @@ Manuscript items
   individual folds (``appendix_S12_spatial_cv.figure_S21.fold_dots``); grey column =
   mean of the per-site values over the scored sites with a site-bootstrap 95% interval.
 * Caption numbers: groups per site (Catumbi 11, ..., 58 in total), the site not scored
-  with the 200 m buffer, and the column values 0.904 (0.868-0.937), 0.641 (0.576-0.717)
-  on the eight testable sites, 0.650 (0.577-0.726) and 0.628 (0.575-0.678)
+  with the 200 m buffer, and the column values 0.906 (0.870-0.938), 0.642 (0.577-0.717)
+  on the eight testable sites, 0.651 (0.578-0.729) and 0.629 (0.577-0.679)
   -> heldout_component_values.csv, caption_numbers.txt.
 
 Scoring as in SI S12 'Scoring' (the second criterion per site for the component
@@ -95,7 +95,7 @@ nsc = [cfg.site_name(x) for x in testable if x not in set(lc[PRIM_B].site)]
 lines.append(f"not scored with the {PRIM_B} m buffer: {', '.join(nsc) or 'none'}")
 for k, (m, lo, hi, n) in Pv.items():
     lines.append(f"{lab[k]}: {m:.3f} ({lo:.3f}-{hi:.3f}), {n} sites")
-lines.append("(manuscript: 0.904 (0.868-0.937); 0.641 (0.576-0.717); 0.650 (0.577-0.726); 0.628 (0.575-0.678))")
+lines.append("(manuscript: 0.906 (0.870-0.938); 0.642 (0.577-0.717); 0.651 (0.578-0.729); 0.629 (0.577-0.679))")
 (OUT / "caption_numbers.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
 print("\n".join(lines))
 

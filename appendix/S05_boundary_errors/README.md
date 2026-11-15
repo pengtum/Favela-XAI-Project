@@ -2,7 +2,7 @@
 
 Where the classifier errs and why (SI Section S5). Errors concentrate at the
 official 2013 favela boundary: 26.8% of buildings within 6 m of the boundary
-are misclassified against 3.7% at 90 m or more (ratio 7.2), and the near rate
+are misclassified against 3.7% at 90 m or more (ratio 7.3), and the near rate
 exceeds the far rate in all ten sites. The Tree-SHAP drivers of the false
 positives are site-dependent.
 

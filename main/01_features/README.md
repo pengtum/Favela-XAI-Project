@@ -61,11 +61,26 @@ Data are not distributed with the code; `data/README.md` lists the sources.
 |---|---|---|
 | `<site>_footprints_clean.gpkg` | cleaned footprints of the window with `label` (`favela` / `not-favela`) | 01 |
 | `<site>_buildings_tessellated.gpkg`, `<site>_tessellation.gpkg`, `<site>_excluded_buildings.gpkg` | kept buildings, their cells (joined by `uID`) and excluded buildings with the reason | 02 |
-| `<site>_buildings_features.gpkg` | per-site building table: `uID`, `cod_unico`, `Tipo`, `ALTURA` (recorded height, m), `label`, the 25 indicators, geometry (EPSG:31983); input of every later folder | 03 |
+| `<site>_buildings_features.gpkg` | per-site building table: `uID`, the attributes of `main_01_features.keep_source_columns` that the footprint layer has (`cod_unico` record identifier, `Tipo` cadastre class, `ALTURA` recorded height in m), `label`, the 25 indicators, geometry (EPSG:31983); input of every later folder (row order: `main/02_classification/README.md`, 'Row order'). The per-site tables of the analysis carry `uID`, `label`, `Tipo`, `ALTURA`, the 25 indicators and the geometry, without `cod_unico`, which no later step reads | 03 |
 | `preprocessing_report.csv`, `site_counts.csv`, `indicator_missing_values.csv` | counts per cleaning and exclusion step, per-class building counts and positions, missing indicator values | 04 |
 | `signed_distance.parquet` | site, `uID`, `is_favela`, `signed_dist` (m, negative on the favela side) | 05 |
 | `table_S2_indicators.tex`, `indicator_registry.csv` | SI Table S2 and the full indicator registry | 06 |
 | `fig1_map_sites.*`, `fig1_map_input.*`, `fig1_map_feat_<indicator>.*` | Fig. 1 element maps (PDF and SVG) | 08, 09 |
+
+The covered area ratio (`CAR` = `area` / `tes_area`) is not bounded by 1:
+where footprints touch or overlap, the boundary between their cells, drawn
+from the footprints shrunk by `tessellation.shrink` and discretised at
+`tessellation.segment`, can cut into a footprint, and 872 of the 188,292
+buildings of the per-site tables of the analysis have `CAR` > 1.
+
+## Labels of the analysed buildings
+
+The favela labels analysed in the paper (81,834 of the 188,292 buildings) were
+assigned when the study data were prepared, and the per-building tables of the
+analysis carry them; every later folder reads the label from the table. The
+overlay rule of this folder (`labels` in `config.yaml`: footprint intersects
+the dissolved 2013 polygons) reproduces them for all but 15 buildings (SI
+Table S8; `appendix/S10_boundaries_2013_2019`).
 
 ## Settings with alternatives
 

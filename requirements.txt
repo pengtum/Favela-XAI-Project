@@ -1,28 +1,28 @@
-# pip equivalent of environment.yml (Python 3.10).
-# OSM streets are downloaded with osmnx 2.1 in a separate Python >= 3.11
-# environment (environment-download.yml).
+# pip equivalent of environment.yml (Python 3.12): the versions with which the
+# analyses were run and verified. OSM streets are downloaded with osmnx 2.1 in
+# a separate environment (environment-download.yml).
 #
-#   python3.10 -m venv .venv && . .venv/bin/activate
+#   python3.12 -m venv .venv && . .venv/bin/activate
 #   pip install -r requirements.txt
-geopandas==0.14.4
-shapely>=2.1,<2.2
-pyogrio==0.10.0
-pyproj>=3.6,<3.7
-momepy==0.8.1
-libpysal==4.12.1
+geopandas==1.1.2
+shapely==2.1.2
+pyogrio==0.12.1
+pyproj==3.7.2
+momepy==0.11.0
+libpysal==4.14.1
 networkx==3.3
-numpy==1.26.4
-pandas==2.2.3
-scipy==1.11.4
-scikit-learn==1.3.2
-xgboost==1.7.6
-shap==0.45.1
-matplotlib==3.8.4
-pyarrow==15.0.2
-PyYAML==6.0.2
-rasterio==1.3.10
-rasterstats==0.19.0
-contextily==1.6.2
-pymupdf>=1.24,<1.25
-tqdm
+numpy==2.0.2
+pandas==3.0.2
+scipy==1.17.1
+scikit-learn==1.8.0
+xgboost==2.1.4    # 2.1.x: the per-site models were fitted with xgboost 2.1.2 (README, Installation)
+shap==0.49.1
+matplotlib==3.10.8
+pyarrow==23.0.1
+PyYAML==6.0.1
+rasterio==1.5.0
+rasterstats==0.20.0
+contextily==1.7.0
+pymupdf==1.26.7
+tqdm==4.66.5
 -e .

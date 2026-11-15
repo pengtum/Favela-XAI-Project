@@ -321,7 +321,7 @@ def site_names(cfg, sites) -> str:
 
 
 def tex_dot(v: float, nd: int = 3) -> str:
-    """Decimal as printed in the SI, e.g. 0.644 -> 0.644 ('--' when missing)."""
+    """Decimal as printed in the SI, e.g. 0.6452 -> 0.645 ('--' when missing)."""
     if v is None or not np.isfinite(v):
         return "--"
     txt = f"{v:.{nd}f}"
@@ -340,7 +340,7 @@ def f2(v) -> str:
 
 
 def ci3(r: dict, m: str, pre: str = "") -> str:
-    """'0.644 (0.582--0.714)' from a summary dict (plain decimals, as in Tables S11-S12)."""
+    """'0.645 (0.584--0.714)' from a summary dict (plain decimals, as in Tables S11-S12)."""
     v = r.get(f"{pre}{m}", np.nan)
     if v is None or not np.isfinite(v):
         return "--"

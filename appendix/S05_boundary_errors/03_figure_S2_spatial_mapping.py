@@ -7,7 +7,7 @@ Manuscript items
 
 What is drawn
 * ``appendix_S05_boundary_errors.spatial_mapping_figure.buildings``:
-  ``test_only``: held-out test buildings of the stratified 80/20 split coloured
+  ``test_only``: held-out test buildings of the 80/20 split of the main model coloured
   by outcome, training buildings in neutral grey;
   ``all_buildings`` (default, as published): every building coloured by the prediction
   of its site model (training and held-out test buildings).

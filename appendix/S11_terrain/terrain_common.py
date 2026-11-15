@@ -7,7 +7,11 @@ run on its own.
 Contents
 * names of the output files of this folder (all in outputs/appendix/S11_terrain/);
 * the nine terrain features and the column orders of the three classifiers;
-* the classifier and the train/test split of the ablation (config ``terrain``);
+* the classifier, its class coding and the train/test split of the ablation
+  (config ``terrain``); with ``terrain.classifier: model_main`` the Morph
+  model is the main per-site model of main/02_classification (same split,
+  training-row order, settings and class coding), so the Morph column of SI
+  Table S9 equals the accuracy of SI Table S3;
 * the per-site accuracy drawn in SI Figs S14 and S15;
 * site names used in the figures.
 
@@ -79,28 +83,28 @@ def combined_features(cfg) -> list[str]:
 # -----------------------------------------------------------------------------
 # Classifier and split of the ablation (SI Table S9 caption)
 # -----------------------------------------------------------------------------
-def ablation_classifier(cfg):
-    """Unfitted classifier used for all three feature sets (``terrain.classifier``).
+def ablation_classifier_section(cfg) -> str:
+    """Config section of the classifier used for all three feature sets (``terrain.classifier``).
 
-    ``model_main``: the Methods 4.4 settings (200 trees, max depth 6, learning
-    rate 0.1, seed 42). ``model_cv``: 100 trees, seed 432, other settings at
-    their defaults.
+    ``model_main``: the Methods 4.4 settings (100 trees, max depth 6, learning
+    rate 0.3, seed 432; xgboost defaults), fitted with the class coding of
+    ``model_main.fit_formal_as_class_1``. ``model_cv``: 100 trees, seed 432,
+    other settings at their defaults, intercept of ``model_cv.base_score``.
+    Fitted with favela_xai.model.fit_classifier.
     """
-    from favela_xai.model import cv_classifier, main_classifier
-
     kind = cfg.get("terrain.classifier")
-    if kind == "model_main":
-        return main_classifier(cfg)
-    if kind == "model_cv":
-        return cv_classifier(cfg)
+    if kind in ("model_main", "model_cv"):
+        return kind
     raise ConfigError(f"terrain.classifier must be model_main or model_cv, not '{kind}'")
 
 
-def ablation_split(y: np.ndarray, cfg) -> tuple[np.ndarray, np.ndarray]:
+def ablation_split(y: np.ndarray, uid: np.ndarray, cfg) -> tuple[np.ndarray, np.ndarray]:
     """Row positions of the train and test buildings of one site.
 
-    ``model_main``: the Methods 4.4 split (stratified 80/20, seed 42,
-    favela_xai.model.main_split). ``model_cv``: the split of
+    ``model_main``: the Methods 4.4 split of the main per-site model
+    (unstratified 80/20, seed 432, drawn on the buildings ordered by ``uid``;
+    favela_xai.model.main_split), training rows in the order in which the
+    main model is fitted. ``model_cv``: the split of
     ``appendix_S11_terrain.model_cv_split`` (80/20, unstratified, seed 432).
     """
     from sklearn.model_selection import train_test_split
@@ -108,7 +112,7 @@ def ablation_split(y: np.ndarray, cfg) -> tuple[np.ndarray, np.ndarray]:
     from favela_xai.model import main_split
 
     if cfg.get("terrain.classifier") == "model_main":
-        return main_split(y, cfg)
+        return main_split(y, cfg, uid)
     s = cfg.get("appendix_S11_terrain.model_cv_split")
     idx = np.arange(len(y))
     tr, te = train_test_split(idx, test_size=float(s["test_size"]),

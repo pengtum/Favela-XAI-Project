@@ -30,9 +30,11 @@ Inputs (outputs/main/01_features/, written by 02_tessellation.py)
   <site>_buildings_tessellated.gpkg, <site>_tessellation.gpkg; config.yaml: indicators.*
 
 Outputs (outputs/main/01_features/)
-  <site>_buildings_features.gpkg      products.features_gpkg: uID, cod_unico, Tipo, ALTURA
-                                      (recorded height), label, the 25 indicators, geometry
-                                      (EPSG:31983)
+  <site>_buildings_features.gpkg      products.features_gpkg: uID, the columns of
+                                      main_01_features.keep_source_columns that the layer has
+                                      (cod_unico, Tipo, ALTURA = recorded height), label, the
+                                      25 indicators, geometry (EPSG:31983); the per-site tables
+                                      of the analysis carry Tipo and ALTURA, not cod_unico
   steps/<site>_indicator_missing.csv  missing values per indicator (collected by 04_site_summary.py)
 
 Run from the repository root (all sites, or a subset):

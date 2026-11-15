@@ -48,10 +48,11 @@ paths:
     osm_streets_dir: data/raw/osm_streets
     # Cached basemap tiles for Fig. 1a (optional download, CARTO/OSM attribution)
     basemap_cache_dir: data/raw/context/basemap_cache
-    # 5 m LiDAR digital terrain model (SI S11), available from the Instituto
-    # Municipal de Urbanismo Pereira Passos (IPP) on request. Set the path to
-    # the local GeoTIFF (EPSG:31983); scripts that need it stop with a message
-    # while this is null.
+    # 5 m LiDAR digital terrain model (DTM; SI S11), available from the
+    # Instituto Municipal de Urbanismo Pereira Passos (IPP) on request. The
+    # terrain analyses (SI S11 and the slope columns of SI Table S1) use this
+    # DTM. Set the path to the local GeoTIFF (EPSG:31983); scripts that need it
+    # stop with a message while this is null.
     elevation_raster: null
 
 # Shared intermediate products, relative to the outputs root. {site} is
@@ -79,6 +80,9 @@ products:
   attribution_pca_scores: main/05_attribution_plane/attribution_pca_scores.parquet
   # appendix/S12_spatial_cv
   spatial_cv_folds: appendix/S12_spatial_cv/folds_all.parquet
+  # classifier-settings sensitivity, per site and variant (16_classifier_settings.py;
+  # read by 11_ranking_stability.py for the rows 'Classifier settings' of SI Table S16)
+  classifier_settings_by_site: appendix/S12_spatial_cv/classifier_settings/settings_by_site.csv
 
 # -----------------------------------------------------------------------------
 # Study sites (Methods 4.1; SI S2).
@@ -173,6 +177,12 @@ indicators:
 # -----------------------------------------------------------------------------
 # Favela labels (Methods 4.1): a building is labelled favela when it falls
 # within the official 2013 favela boundaries.
+# The labels analysed in the paper (81,834 of the 188,292 buildings favela)
+# were assigned when the study data were prepared; the per-building tables of
+# the analysis carry these labels, and every analysis reads them from the
+# table. The overlay rule below (main/01_features/01_preprocess_footprints.py)
+# reproduces them for all but 15 buildings (SI Table S8;
+# appendix/S10_boundaries_2013_2019).
 # -----------------------------------------------------------------------------
 labels:
   rule: footprint_intersects   # footprint_intersects | centroid_within (dissolved 2013 polygons)
@@ -182,32 +192,60 @@ labels:
 
 # -----------------------------------------------------------------------------
 # Main per-site classifier (Methods 4.4). Used for SI Table S3, Fig. 2b, all
-# Tree-SHAP attributions of the main analysis, SI S8 transfer and SI S11.
+# Tree-SHAP attributions of the main analysis, SI S8 transfer and the Morph
+# column of SI S11 (SI Table S9).
+# The tree settings are the xgboost defaults with which the analysed models
+# were fitted (xgboost 2.1, environment.yml; a model_main fit stops under
+# another xgboost series): 100 trees, max depth 6, learning
+# rate 0.3, hist tree method, intercept estimated by xgboost from the training
+# labels. Model seed 432; unstratified 80/20 split with seed 432.
+# Row order: the split is drawn with sklearn train_test_split on the
+# buildings of the site ordered by uID, and the training rows are passed to
+# XGBoost in the order train_test_split returns them (xgboost's hist quantile
+# sketch depends on that order in the larger sites). Every output (split,
+# predictions, Tree SHAP) follows the row order of the per-building table;
+# that table is read in its own order (main/02_classification/README.md,
+# 'Row order').
 # -----------------------------------------------------------------------------
 model_main:
-  n_estimators: 200       # Methods 4.4: 200 trees
-  max_depth: 6            # Methods 4.4
-  learning_rate: 0.1      # Methods 4.4
-  random_state: 42        # Methods 4.4
-  test_size: 0.2          # Methods 4.4: stratified 80/20 train/test split
-  stratify: true          # Methods 4.4
-  split_random_state: 42  # Methods 4.4
+  n_estimators: 100       # Methods 4.4: xgboost default (100 trees)
+  max_depth: 6            # Methods 4.4: xgboost default
+  learning_rate: 0.3      # Methods 4.4: xgboost default
+  random_state: 432       # Methods 4.4: model seed
+  test_size: 0.2          # Methods 4.4: 80/20 train/test split
+  stratify: false         # Methods 4.4: unstratified split
+  split_random_state: 432 # Methods 4.4: split seed
   eval_metric: logloss    # XGBoost evaluation metric
   # Missing indicator values: median of the training rows, applied to all
   # buildings of the site.
   imputation: median
-  positive_class: favela  # class 1 = favela (SI Table S3)
+  positive_class: favela  # favela = positive class of the SI Table S3 metrics
+  # Class coding of the fit: true = formal settlement fitted as class 1, the
+  # coding of the analysed models (favela probability = 1 - P(class 1); Tree
+  # SHAP negated so that positive values point toward favela); false = favela
+  # fitted as class 1, the mirrored model, which agrees with it up to
+  # floating-point rounding (rounding can decide a split, so the two are not
+  # identical bit for bit).
+  fit_formal_as_class_1: true
 
 # -----------------------------------------------------------------------------
-# Validation-pipeline classifier (Methods 4.5 and 4.7; SI S5, S12, S14):
-# XGBoost with 100 trees and seed 432, other settings at their defaults,
-# missing indicator values imputed with the training median.
+# Validation-pipeline classifier (Methods 4.5 and 4.7; SI S5, S12, S14, S15):
+# the tree settings and seed of the main per-site models (model_main: 100
+# trees, seed 432, xgboost defaults otherwise) with the intercept of
+# base_score below, missing indicator values imputed with the training
+# median.
 # -----------------------------------------------------------------------------
 model_cv:
   n_estimators: 100       # Methods 4.5, 4.7; SI S5, S12, S14
   random_state: 432       # Methods 4.5, 4.7; SI S5, S12, S14
   eval_metric: logloss    # XGBoost evaluation metric
   imputation: median      # training median (a column with no values -> 0)
+  # Intercept (XGBoost base_score) of each fit: training_label_mean = share of
+  # class 1 among the training rows of the fit, the intercept with which the
+  # validation results were computed (the estimate of xgboost 3.0 and later;
+  # set explicitly because xgboost 2.1 estimates it differently);
+  # xgboost_default = left to the installed xgboost.
+  base_score: training_label_mean
   # true: the classifier is fitted with formal settlement as class 1 and the
   # favela probability is taken as 1 - p.
   fit_formal_as_class_1: true
@@ -352,25 +390,32 @@ block_complexity:
   min_shared_boundary_m: 0.01      # cells sharing more than 1 cm of boundary are adjacent
   frontier_buffer_m: 0.5           # cells touching the block boundary (0.5 m buffer) get k = 1
   tessellation_fallback_buffer_m: 0.5   # cell = building buffered by 0.5 m where a block's tessellation fails
+  # Classifier of the SI S9 feature-set comparison (SI Tables S6-S7; the
+  # raw-indicator benchmark of Results 2.4), separate from the main per-site
+  # models: XGBoost with 200 trees, max depth 6, learning rate 0.1, random
+  # seed 42, favela = class 1; base_score as in model_cv (training_label_mean,
+  # the intercept with which SI Tables S6-S7 were computed).
+  classifier: {n_estimators: 200, max_depth: 6, learning_rate: 0.1, random_state: 42, eval_metric: logloss, base_score: training_label_mean}
   # SI S9 per-site protocol (SI Table S6): stratified 80/20 split (seed 42),
-  # classifier of Methods 4.4
-  persite: {classifier: model_main, test_size: 0.2, stratify: true, split_random_state: 42}
-  # SI Table S7: stratified five-fold cross-validation, classifier of
-  # Methods 4.4
-  pooled: {classifier: model_main, n_folds: 5, shuffle: true, random_state: 42}
+  # block_complexity.classifier
+  persite: {classifier: block_complexity.classifier, test_size: 0.2, stratify: true, split_random_state: 42}
+  # SI Table S7: stratified five-fold cross-validation,
+  # block_complexity.classifier
+  pooled: {classifier: block_complexity.classifier, n_folds: 5, shuffle: true, random_state: 42}
   figure_k_clip: 12                # SI Fig. S13: k clipped at 12
 
 # -----------------------------------------------------------------------------
 # Terrain ablation (Methods 4.10; SI S11; SI Table S9; SI Figs S14-S18).
-# The elevation raster path is paths.raw.elevation_raster (user-supplied).
+# The elevation raster (paths.raw.elevation_raster, user-supplied) is the 5 m
+# LiDAR digital terrain model (DTM).
 # -----------------------------------------------------------------------------
 terrain:
-  resolution_m: 5                  # 5 m digital terrain model (SI S11)
+  resolution_m: 5                  # 5 m LiDAR digital terrain model (DTM; SI S11)
   slope_method: finite_difference  # finite-difference gradient over 5 m cells (degrees)
   zonal_statistics: [elev_mean, elev_min, elev_max, elev_std, elev_range, slope_mean, slope_median, slope_std, slope_max]   # per-building statistics (SI S11)
   zonal_all_touched: true          # every raster cell touching the footprint counts
   building_set: main_analysis      # per-site building set of the main analysis
-  classifier: model_main           # per-site classifier of Methods 4.4 (SI Table S9)
+  classifier: model_main           # per-site classifier of Methods 4.4 (SI Table S9): Morph column = SI Table S3
   shared_split: true               # terrain and combined models reuse the morphology model's split
   ovl_kde_bandwidth: 0.3           # kernel bandwidth of the overlap coefficient (OVL)
   ovl_grid_points: 500             # grid size of the overlap coefficient
@@ -435,8 +480,8 @@ spatial_cv:
     null_model_seed: 432                  # SI S12: model seed of the split-refit null
     # Model of the split-refit null (SI S12 'Stability of the attributions'):
     # model_cv = validation-pipeline model (100 trees, seed null_model_seed) on
-    # an unstratified 80/20 split; model_main = the Methods 4.4 model on a
-    # split stratified as in model_main.
+    # an unstratified 80/20 split; model_main = the Methods 4.4 model on an
+    # 80/20 split drawn as in model_main (stratify, test_size).
     null_classifier: model_cv
     share_population: favela_buildings    # ED Fig. 3: share of mean |SHAP| over favela buildings (set in steps 10-11; this key is not read)
     top_k: 3                              # SI Table S16 / ED Fig. 3: three leading indicators
@@ -444,6 +489,42 @@ spatial_cv:
     min_test_buildings_per_bin: 200   # SI Fig. S20: at least 200 test buildings per bin ...
     min_sites_per_bin: 5              # ... from at least five sites
     bin_edges_m: [0, 5, 10, 25, 50, 100, 200, 400, 800]   # distance bins (last bin open)
+
+# -----------------------------------------------------------------------------
+# Classifier-settings sensitivity of the site-level results (Methods 4.4;
+# SI S12; SI Table S16, rows 'Classifier settings'):
+# appendix/S12_spatial_cv/16_classifier_settings.py. Every variant refits the
+# main per-site model of every site through the model_main code path
+# (favela_xai.model.fit_main_model) with the model_main keys below replaced;
+# everything else is model_main: class coding (fit_formal_as_class_1),
+# intercept (xgboost default), split drawn on the rows in uID order with the
+# training rows in split order, training-median imputation, path-dependent Tree
+# SHAP of every building (positive toward favela). The main analysis
+# (model_main as it stands) is recomputed as the reference and checked against
+# the stored main/02-04 outputs before any variant is fitted. Every variant is
+# reported.
+# -----------------------------------------------------------------------------
+classifier_settings_sensitivity:
+  # The main analysis (model_main unchanged), the reference of every comparison
+  reference: {key: V0, label: "Main analysis: 100 trees, maximum depth 6, learning rate 0.3, unstratified split (seed 432)"}
+  # Each variant replaces the model_main keys given; listed in the order reported
+  variants:
+    # 200 trees, maximum depth 6, learning rate 0.1, stratified 80/20 split
+    # with seed 42
+    - {key: V1, label: "200 trees, learning rate 0.1, stratified split (seed 42)", model_main: {n_estimators: 200, max_depth: 6, learning_rate: 0.1, stratify: true, split_random_state: 42}}
+    - {key: V2, label: "Maximum depth 4", model_main: {max_depth: 4}}
+    - {key: V3, label: "Maximum depth 8", model_main: {max_depth: 8}}
+    - {key: V4, label: "Learning rate 0.1, 300 trees", model_main: {learning_rate: 0.1, n_estimators: 300}}
+  # Indicators whose sign-change distance x0 of the cross-site boundary profile
+  # is reported (Methods 4.8; SI Table S5; Fig. 4)
+  boundary_indicators: [mean_interbuilding_distance, adjacency]
+  # Check of the recomputed main analysis against the stored outputs: test
+  # accuracy exactly (products.site_metrics), held-out set exactly
+  # (products.split_csv), Tree SHAP within this absolute tolerance
+  # (products.shap_gpkg), per-site and cross-site rankings identical
+  # (main/03_site_signatures), |dS|, x0 and w at the precision of SI Table S5
+  # (products.transition_metrics)
+  reference_shap_tolerance: 1.0e-5
 
 # -----------------------------------------------------------------------------
 # Robustness of the boundary analyses (SI S13; ED Fig. 5; SI Fig. S22;
@@ -567,7 +648,8 @@ main_05_attribution_plane:
     rocinha: "#64b5cd"
   # Raw-indicator benchmark of Results 2.4 (SI S7; SI Table S6), computed by
   # appendix/S09_block_complexity_k/03_persite_protocol.py (protocol in
-  # 'block_complexity.persite' and 'pca.raw_benchmark'); summary file read by
+  # 'block_complexity.classifier', 'block_complexity.persite' and
+  # 'pca.raw_benchmark'); summary file read by
   # 03_raw_benchmark_numbers.py, relative to the outputs root.
   raw_benchmark_summary: appendix/S09_block_complexity_k/k_persite_summary.csv
 
@@ -620,9 +702,13 @@ appendix_S11_terrain:
 # -----------------------------------------------------------------------------
 main_01_features:
   # Attributes of the 2013 footprint layer carried into the per-site building
-  # tables of this folder: cod_unico and Tipo trace each building back to the
-  # municipal layer; ALTURA, the recorded height (m), gives the heights of SI
-  # Section S6 (appendix/S06_attribution_analyses/07_recorded_heights.py).
+  # tables of this folder, where the layer has them: cod_unico, the record
+  # identifier of the layer; Tipo, the cadastre class; ALTURA, the recorded
+  # height (m). Tipo and ALTURA give the heights of SI Section S6
+  # (appendix/S06_attribution_analyses/07_recorded_heights.py) and Tipo the
+  # classes of appendix/S06_attribution_analyses/08_adjacency_components.py.
+  # The per-site tables of the analysis carry Tipo and ALTURA but not
+  # cod_unico, which no later step reads.
   keep_source_columns: [cod_unico, Tipo, ALTURA]
   # Building totals of Methods 4.1 (footprints of the ten site windows before
   # the tessellation stage); 04_site_summary.py prints them next to the

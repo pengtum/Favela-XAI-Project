@@ -5,7 +5,7 @@ Manuscript items
   buildings of all ten sites, one PCA fitted to the pooled matrix, first two
   components kept.
 * Fig. 5: explained variance of PC1 and PC2 (printed at the end of the run;
-  the Fig. 5 caption gives 17.9% and 8.5%); the scores are drawn by
+  the Fig. 5 caption gives 18.0% and 8.3%); the scores are drawn by
   02_figure5.py.
 * Results 2.4: within every site the favela and formal-settlement clouds are
   displaced in their centres of mass (per-site class means of PC1 and PC2 in
@@ -155,7 +155,7 @@ def main() -> None:
 
     # ---- summary for Fig. 5 and Results 2.4 ------------------------------------
     print(f"\nexplained variance: PC1 {100 * evr.iloc[0]:.1f}%, PC2 {100 * evr.iloc[1]:.1f}% "
-          "(Fig. 5 caption: 17.9% and 8.5%)")
+          "(Fig. 5 caption: 18.0% and 8.3%)")
     print("components with reversed sign:", res["flipped"] or "none")
     top = vec.iloc[0].mul(np.sqrt(eigen[0])).sort_values(ascending=False).head(5)
     print("largest PC1 loadings: " + ", ".join(f"{label_of(f)} {v:.2f}" for f, v in top.items()))

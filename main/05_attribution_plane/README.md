@@ -10,9 +10,9 @@ The PC1 scores are also the input of SI Fig. S10 (`appendix/S07_pca`).
 | Item | Script |
 |---|---|
 | Methods 4.6: pooled, standardised PCA of the attributions, first two components kept | 01 |
-| Fig. 5: ten panels on common PC1/PC2 axes (PC1 and PC2 explain 17.9% and 8.5% of the variance); density regions = the 15% of grid cells with the highest kernel density of each class; up to 2,000 points per class | 01 (PCA), 02 (drawing) |
+| Fig. 5: ten panels on common PC1/PC2 axes (PC1 and PC2 explain 18.0% and 8.3% of the variance); density regions = the 15% of grid cells with the highest kernel density of each class; up to 2,000 points per class | 01 (PCA), 02 (drawing) |
 | Results 2.4: in every site the favela and formal clouds are displaced in their centres of mass while overlapping | 01, 02 |
-| Results 2.4 and SI Section S7: raw-indicator benchmark (mean per-site accuracy 0.782 and AUC 0.821, against 0.932 and 0.974 for the 25 indicators; SI Table S6) | computed in `appendix/S09_block_complexity_k/03_persite_protocol.py`, printed by 03 |
+| Results 2.4 and SI Section S7: raw-indicator benchmark (mean per-site accuracy 0.781 and AUC 0.816, against 0.929 and 0.973 for the 25 indicators; SI Table S6) | computed in `appendix/S09_block_complexity_k/03_persite_protocol.py`, printed by 03 |
 | SI Section S7, SI Fig. S10: PC1 thresholded within each site at the ROC-Youden optimum | 01 (scores); thresholds and maps in `appendix/S07_pca` |
 
 ## Run order
@@ -51,4 +51,4 @@ python main/05_attribution_plane/03_raw_benchmark_numbers.py   # Results 2.4 ben
 - Component signs (`orient_pc1`, `orient_pc2`): PC1 oriented so that the pooled favela mean is above the formal mean; PC2 with its largest loading positive.
 - Density regions: Gaussian kernel density of each class on a 150 × 150 grid over the 1st-99th percentile box, from at most 20,000 buildings per site (seed 42); region = grid cells above the 85th percentile of the class density.
 - Points: random samples of up to 2,000 buildings per class (seed 42).
-- Raw-indicator benchmark (`pca.raw_benchmark`, `block_complexity.persite`): per site, two-component PCA of the 25 unstandardised raw indicators, evaluated on the SI S9 subset (buildings with a valid block-complexity index k and all 25 indicators); the 25-indicator reference (0.932 / 0.974) is the "Raw 25 indicators" row of SI Table S6 on the same subset.
+- Raw-indicator benchmark (`pca.raw_benchmark`, `block_complexity.persite`): per site, two-component PCA of the 25 unstandardised raw indicators, evaluated on the SI S9 subset (buildings with a valid block-complexity index k and all 25 indicators); the 25-indicator reference (0.929 / 0.973) is the "Raw 25 indicators" row of SI Table S6 on the same subset.

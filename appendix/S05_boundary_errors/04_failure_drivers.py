@@ -147,7 +147,7 @@ def main() -> None:
     cb.outline.set_visible(False)
     cb.solids.set_rasterized(False)
     cb.solids.set_edgecolor("face")
-    fig.tight_layout()
+    fig.tight_layout(rect=[0, 0, 1, 0.957])          # top band kept free (SI Fig. S3 proportions; title in the caption)
     fig.savefig(out / C.FIGURE_FAILURE, bbox_inches="tight", dpi=600)
     fig.savefig((out / C.FIGURE_FAILURE).with_suffix(".png"), bbox_inches="tight", dpi=200)
     plt.close(fig)

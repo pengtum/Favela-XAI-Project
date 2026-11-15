@@ -5,8 +5,10 @@ site-level attribution rankings hold under that separation. Designs: square bloc
 100-1,000 m in three grid placements with training buffers of 0-400 m and matched
 random-removal controls; hexagons, k-means units, five k-means folds and ten folds; the
 held-out favela component; the pooled leave-site-out. Every fold is refitted (XGBoost, 100
-trees, seed 432, training-median imputation); the folds of the ranking analysis are also
-explained with out-of-fold Tree SHAP.
+trees, seed 432, the settings of the main per-site models; intercept = share of class 1 among
+the fold's training rows; training-median imputation); the folds of the ranking analysis are
+also explained with out-of-fold Tree SHAP. Units, folds and random draws are assigned by row
+position, in the row order of the per-building tables of `main/01_features`.
 
 ## Manuscript items
 
@@ -18,15 +20,16 @@ explained with out-of-fold Tree SHAP.
 | Supplementary Table S15 and Fig. S20 (distance to training, error by distance) | 07, 08 |
 | Supplementary Fig. S21 (held-out favela component) | 09 |
 | Supplementary Table S16 (ranking stability) | 11 |
+| Supplementary Table S16, rows 'Classifier settings' (site-level results under alternative settings of the main per-site model; Methods 4.4) | 16, 11 |
 | Extended Data Fig. 3 (rankings under spatial cross-validation) | 11, 13 (panel a: `ed3_schematic.py`) |
 | Extended Data Fig. 4 (per-site importance shares) | 11, 14 |
 | Supplementary Data 1 and 2: per-fold record of the spatial validation and of the held-out favela component (summarised in SI Table S14) | 15 |
 
 Main results (both scoring criteria, site-bootstrap 95% intervals):
 
-* Balanced accuracy 0.644 (0.582-0.714, nine sites) for the primary design (250 m blocks, 200 m buffer) against 0.898 for a random 80/20 split; held-out favela component 0.650 without a buffer and 0.628 with the 200 m buffer; pooled leave-site-out 0.702 (step 05).
-* Spearman's rho between the out-of-fold and the main-text site rankings: 0.874, 0.902 and 0.864 for 250, 500 and 1,000 m blocks with the 200 m buffer, against 0.910 for the split-refit null (step 11).
-* The three leading indicators keep their direction in 73 of 81 site-indicator-placement combinations (step 12).
+* Balanced accuracy 0.645 (0.584-0.714, nine sites) for the primary design (250 m blocks, 200 m buffer) against 0.895 for a random 80/20 split; held-out favela component 0.651 without a buffer and 0.629 with the 200 m buffer; pooled leave-site-out 0.695 (step 05).
+* Spearman's rho between the out-of-fold and the main-text site rankings: 0.871, 0.901 and 0.854 for 250, 500 and 1,000 m blocks with the 200 m buffer, against 0.924 for the split-refit null (step 11).
+* The three leading indicators keep their direction in 74 of 81 site-indicator-placement combinations (step 12).
 
 Steps 05, 07, 09 and 11-14 also write the values quoted in the text and captions to `in_text_numbers.txt` or `*caption_numbers.txt`. The blocked boundary error rates (Results 2.1, SI S5) use the same fold maker and are computed in `main/02_classification/05_blocked_error_rates.py`.
 
@@ -50,7 +53,11 @@ python appendix/S12_spatial_cv/12_direction_survival.py   # direction of the att
 python appendix/S12_spatial_cv/13_figure_ED3.py           # Extended Data Fig. 3
 python appendix/S12_spatial_cv/14_figure_ED4.py           # Extended Data Fig. 4
 python appendix/S12_spatial_cv/15_supplementary_data.py   # per-fold record: Supplementary Data 1 and 2 (two CSV files)
+python appendix/S12_spatial_cv/16_classifier_settings.py  # main per-site model under alternative classifier settings (after main/01-04)
+python appendix/S12_spatial_cv/11_ranking_stability.py    # again: adds the rows 'Classifier settings' to Supplementary Table S16
 ```
+
+Step 16 reads the outputs of `main/01_features` to `main/04_boundary_profiles` and none of the other steps of this folder. It first recomputes the main analysis and stops (exit code 1) unless that reproduces the stored held-out sets, accuracies, Tree SHAP, rankings and boundary metrics; step 11 adds the rows 'Classifier settings' whenever the output of step 16 exists, so step 16 can also run before step 11.
 
 Steps 03 and 10 fit several thousand models. They write one shard per site and job and skip existing shards, so an interrupted run resumes with the same command, and different `--sites` can run in parallel.
 
@@ -62,14 +69,14 @@ Inputs: per-site feature tables and signed distances (`main/01_features`), Tree 
 
 Outputs, under `outputs/appendix/S12_spatial_cv/`:
 
-* `tables/`: LaTeX files of Supplementary Tables S10-S16; `figures/`: PDF (and PNG preview) of Supplementary Figs S19-S21 and Extended Data Figs 3-4;
+* `tables/`: LaTeX files of Supplementary Tables S10-S16 (with step 16 also `table_classifier_settings.tex` and `table_R1_ranking_stability_settings_rows.tex`); `figures/`: PDF (and PNG preview) of Supplementary Figs S19-S21 and Extended Data Figs 3-4;
 * `folds_all.parquet` (fold record), `predictions_oof.parquet`, `supplementary_data/` (per-fold record);
-* `accuracy/`, `distances/`, `component/`, `ranking/`, `direction/`: plotted values and quoted numbers;
+* `accuracy/`, `distances/`, `component/`, `ranking/`, `direction/`, `classifier_settings/` (step 16): plotted values and quoted numbers;
 * intermediate files: `site_tables/`, `component_groups/`, `fold_shards/`, `prediction_shards/`, `shap_fold_sums/`, `shap_buildings/`, `logs/`.
 
 ## Settings
 
-All settings are in `config.yaml`: `spatial_cv` (block sizes, placements, buffers, primary design, alternative units, scoring, distances, ranking seeds), `model_cv` (classifier of every fold) and `appendix_S12_spatial_cv` (polygon fields, ranking runs, figure options). `spatial_cv.ranking.null_classifier` selects the model of the split-refit null:
+All settings are in `config.yaml`: `spatial_cv` (block sizes, placements, buffers, primary design, alternative units, scoring, distances, ranking seeds), `model_cv` (classifier of every fold), `appendix_S12_spatial_cv` (polygon fields, ranking runs, figure options) and `classifier_settings_sensitivity` (step 16: the `model_main` keys replaced in each variant, the indicators whose x0 is reported, the tolerance of the check of the main analysis). `spatial_cv.ranking.null_classifier` selects the model of the split-refit null:
 
 * `model_cv`: validation-pipeline model on an unstratified 80/20 split;
-* `model_main`: the Methods 4.4 model on a stratified 80/20 split.
+* `model_main`: the Methods 4.4 model on an 80/20 split drawn as in `model_main` (unstratified).

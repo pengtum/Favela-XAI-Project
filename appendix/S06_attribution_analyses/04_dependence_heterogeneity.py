@@ -122,7 +122,7 @@ def main() -> None:
             sp.set_color(gc)
             sp.set_linewidth(1.7)
         ax.set_title(label_of(f), fontsize=11, color=gc, fontweight="bold", pad=3)
-        ax.text(0.96, 0.06, f"heterogeneity {r['score']:.2f}", transform=ax.transAxes, ha="right", va="bottom",
+        ax.text(0.96, 0.06, f"het {r['score']:.2f}", transform=ax.transAxes, ha="right", va="bottom",
                 fontsize=8.5, color="#555555")
         ax.tick_params(labelsize=8.5)
         ax.locator_params(axis="both", nbins=3)
@@ -136,6 +136,8 @@ def main() -> None:
     sleg = [Line2D([0], [0], color="black", lw=2.4, label="pooled, all sites")]
     sleg += [Line2D([0], [0], color=colours[s], lw=1.4, label=site_label(cfg, s, short=True)) for s in sites]
     fig.legend(handles=sleg, loc="lower center", ncol=6, fontsize=9.5, bbox_to_anchor=(0.5, -0.012))
+    fig.suptitle("Cross-site heterogeneity of the SHAP dependence for all 25 indicators (ten per-site lines + pooled; "
+                 "x = feature value, y = SHAP $\\rightarrow$ favela)", fontsize=12.5, y=0.997)
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
     save_pdf(fig, out / FIGURE, dpi=220)
     plt.close(fig)

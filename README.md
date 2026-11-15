@@ -29,7 +29,7 @@ and OpenStreetMap streets, and a terrain model available from IPP on request
 ```
 Favela-XAI-Project/
 ├── config.yaml               paths and parameters of every analysis
-├── environment.yml           analysis environment (Python 3.10; conda)
+├── environment.yml           analysis environment (Python 3.12; conda)
 ├── environment-download.yml  OpenStreetMap download environment (osmnx; Python 3.11)
 ├── requirements.txt          pip equivalent of environment.yml
 ├── pyproject.toml            installs the shared package src/favela_xai
@@ -62,6 +62,28 @@ conda activate favela-xai
 The OpenStreetMap streets for the block-complexity comparison (SI S9) are
 downloaded once in a separate environment: `conda env create -f environment-download.yml`.
 
+XGBoost is pinned to version 2.1 (`environment.yml`, `requirements.txt`). The
+per-site models of the paper were fitted with xgboost 2.1.2 and its default
+settings; xgboost 2.1.4 reproduces them. xgboost 3.x estimates the model
+intercept (`base_score`) from the training labels in a different way and
+therefore fits different models; a fit of the per-site models stops with an
+error under another xgboost series (`favela_xai.model.require_main_model_xgboost`).
+The validation pipeline and the SI S9 comparison set their intercept
+explicitly (`model_cv.base_score`, `block_complexity.classifier.base_score` in
+`config.yaml`).
+
+The versions in `environment.yml` and `requirements.txt` (Python 3.12, numpy
+2.0, pandas 3.0, scikit-learn 1.8, xgboost 2.1, shap 0.49, scipy 1.17,
+geopandas 1.1, momepy 0.11) are those with which the analyses were run and
+verified. The per-building indicator table distributed with the paper was
+computed with momepy 0.8 (geopandas 0.14, Python 3.10). Recomputing the
+tessellation-based indicators from the footprints with other library versions
+can give slightly different values. The analyses from `main/02_classification`
+onward read the 25 indicators as analysed only from that table
+(`products.features_gpkg`; SI S15 also reads the footprints and cells of
+`main/01_features` step 02 for its alternative adjacency ratio), so the
+pipeline reproduces the reported results from it.
+
 ## Data
 
 - **Raw data.** Building footprints 2013 and the official favela boundaries 2013
@@ -71,8 +93,12 @@ downloaded once in a separate environment: `conda env create -f environment-down
 - **Terrain model.** The 5 m LiDAR digital terrain model (SI S11) is available
   from the Instituto Municipal de Urbanismo Pereira Passos (IPP) on request; set
   `paths.raw.elevation_raster` in `config.yaml`.
-- **Derived data.** The per-building indicators and Tree-SHAP attributions are
-  available from the corresponding author upon reasonable request.
+- **Derived data.** The per-building data of the analysis (labels, held-out
+  split, predictions, the 25 indicators, Tree-SHAP attributions and signed
+  distances, with the per-building input tables read by this code) are
+  provided to the editor and reviewers with the submission and will be
+  deposited in a public repository with a DOI upon publication (see the
+  paper's Data availability statement).
 
 ## Running
 
@@ -148,7 +174,7 @@ few cross-folder dependencies (e.g. `main/05_attribution_plane/03` uses SI S9 st
 | Tables S6-S7 Block complexity | `appendix/S09_block_complexity_k` | 03, 04 |
 | Table S8 Buildings in the 2013 and 2019 boundaries | `appendix/S10_boundaries_2013_2019` | 01 |
 | Table S9 Terrain ablation | `appendix/S11_terrain` | 06 |
-| Tables S10-S16 Spatial cross-validation | `appendix/S12_spatial_cv` | 05, 07, 11 |
+| Tables S10-S16 Spatial cross-validation (Table S16 rows 'Classifier settings': 16, then 11) | `appendix/S12_spatial_cv` | 05, 07, 11, 16 |
 | Table S17 Sensitivity of the sign-change distance | `appendix/S13_boundary_robustness` | 08 |
 | Table S18 Label-free clustering | `appendix/S14_label_free` | 03 |
 | Table S19 Sensitivity to the adjacency ratio (SI Section S15) | `appendix/S15_adjacency_sensitivity` | 01 |

@@ -12,10 +12,14 @@ Design (SI S11; config.yaml ``terrain``, ``appendix_S11_terrain``)
 * Three classifiers per site on one shared train/test split: the 25
   morphological indicators (Morph), the nine terrain features (Terrain) and
   their union (Combined, 34 features).
-* Classifier (``terrain.classifier``): ``model_main`` = XGBoost with the
-  Methods 4.4 settings and split (200 trees, max depth 6, learning rate 0.1,
-  seed 42, stratified 80/20 split with seed 42); ``model_cv`` = XGBoost with
-  100 trees and seed 432, unstratified 80/20 split with seed 432.
+* Classifier (``terrain.classifier``): ``model_main`` = the main per-site
+  model of Methods 4.4 (XGBoost, 100 trees, max depth 6, learning rate 0.3,
+  seed 432; unstratified 80/20 split with seed 432 drawn on the buildings in
+  uID order; training rows in split order; class coding of
+  ``model_main.fit_formal_as_class_1``), so that the Morph model is the main
+  model of main/02_classification and the Morph column equals SI Table S3;
+  ``model_cv`` = XGBoost with 100 trees and seed 432, unstratified 80/20 split
+  with seed 432.
 * Missing values: median of the training rows of the site.
 * Tree SHAP of the Terrain and Combined models on the test buildings
   (``appendix_S11_terrain.shap_rows``); site importance = mean |SHAP| per
@@ -55,7 +59,7 @@ from favela_xai.config import ConfigError, load_config
 from favela_xai.features import MODEL_FEATURE_ORDER
 from favela_xai.io import write_table
 from favela_xai.labels import label_to_int
-from favela_xai.model import classification_metrics
+from favela_xai.model import classification_metrics, favela_probability, fit_classifier, formal_as_class_1
 
 import terrain_common as tc
 
@@ -64,24 +68,34 @@ def fit_on_split(X: pd.DataFrame, y: np.ndarray, train_idx: np.ndarray, test_idx
     """Fit the ablation classifier on the training rows and predict the test rows.
 
     Missing values are replaced by the medians of the training rows (a feature
-    that is missing for every training building is set to 0). Class 1 = favela.
+    that is missing for every training building is set to 0). ``y``: 1 =
+    favela; the class coding of the fit follows the classifier section. The
+    training rows are passed to XGBoost in the order of ``train_idx``.
     """
     cols = list(X.columns)
     X = X.astype(float)
     imputer = SimpleImputer(strategy="median", keep_empty_features=True)
     imputer.fit(X.iloc[train_idx])
     Xi = pd.DataFrame(imputer.transform(X), columns=cols, index=X.index)
-    model = tc.ablation_classifier(cfg).fit(Xi.iloc[train_idx], y[train_idx])
-    pred_test = (model.predict_proba(Xi.iloc[test_idx])[:, 1] >= 0.5).astype(int)
-    return dict(model=model, X_test=Xi.iloc[test_idx], pred_test=pred_test,
+    section = tc.ablation_classifier_section(cfg)
+    formal_as_1 = formal_as_class_1(cfg, section)
+    model = fit_classifier(cfg, section, Xi.iloc[train_idx], y[train_idx])
+    p_fav = favela_probability(model, Xi.iloc[test_idx], formal_as_1)
+    pred_test = (p_fav >= 0.5).astype(int)
+    return dict(model=model, formal_as_1=formal_as_1, X_test=Xi.iloc[test_idx], pred_test=pred_test,
                 metrics=classification_metrics(y[test_idx], pred_test))
 
 
 def mean_abs_shap(fit: dict, cfg) -> pd.Series:
-    """Mean |Tree SHAP| per feature over the explained buildings of one site."""
+    """Mean |Tree SHAP| per feature over the explained buildings of one site.
+
+    SHAP values point toward favela (negated for a model fitted with formal
+    settlement as class 1); only their absolute values enter the importance.
+    """
     if cfg.get("appendix_S11_terrain.shap_rows") != "test_set":
         raise ConfigError("appendix_S11_terrain.shap_rows: only 'test_set' is implemented")
-    values = tree_shap(fit["model"], fit["X_test"], model_output=cfg.get("shap.model_output"))
+    values = tree_shap(fit["model"], fit["X_test"], negate=fit["formal_as_1"],
+                       model_output=cfg.get("shap.model_output"))
     return pd.Series(np.abs(values).mean(axis=0), index=fit["X_test"].columns)
 
 
@@ -115,7 +129,7 @@ def main() -> None:
         y = label_to_int(df["label"])
 
         # One split per site, shared by the three models.
-        train_idx, test_idx = tc.ablation_split(y, cfg)
+        train_idx, test_idx = tc.ablation_split(y, df["uID"].to_numpy(), cfg)
         morph = fit_on_split(df[MODEL_FEATURE_ORDER], y, train_idx, test_idx, cfg)
         terrain = fit_on_split(df[terr], y, train_idx, test_idx, cfg)
         combined = fit_on_split(df[comb], y, train_idx, test_idx, cfg)

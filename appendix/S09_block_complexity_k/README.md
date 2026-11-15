@@ -58,6 +58,6 @@ tables, the two building subsets, number formatting); it is not run on its own.
 - Blocks (`block_complexity`): polygonised OpenStreetMap street network (polygons > 100 m²); each building is assigned to the block containing its centroid.
 - k: tessellation within each block; cells are adjacent when they share > 1 cm of boundary; cells touching the block boundary (0.5 m buffer) have k = 1, the others their breadth-first-search depth from those cells + 1.
 - Building subsets (`k_common.py`): valid k (k >= 1) with complete Tree-SHAP attributions for the distribution of k; in addition all 25 indicators present for the classification comparison.
-- Classifier (`model_main`): XGBoost, 200 trees, max depth 6, learning rate 0.1, seed 42 (Methods 4.4); per-site stratified 80/20 split (seed 42); pooled stratified 5-fold cross-validation (seed 42).
+- Classifier (`block_complexity.classifier`, the classifier of this comparison, separate from the main per-site models of Methods 4.4): XGBoost, 200 trees, max depth 6, learning rate 0.1, seed 42, intercept = favela share of the training rows; per-site stratified 80/20 split (seed 42); pooled stratified 5-fold cross-validation (seed 42). The splits and folds are drawn on the buildings in the row order of the per-building tables.
 - PC1 + PC2 of the raw 25 indicators (`pca.raw_benchmark`): two-component PCA of the unstandardised 25 indicators, fitted within each site.
 - Download and layout settings: `appendix_S09_block_complexity_k`.

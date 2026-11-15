@@ -9,9 +9,11 @@ Manuscript items
     (label-free clustering).
 
 Settings (config.yaml)
-  oof        5 folds, shuffled, StratifiedKFold seed 432 (Methods 4.7)
-  model_cv   XGBoost 100 trees, seed 432, other settings at their defaults; missing values
-             imputed with the training-fold median (0 for an all-missing column);
+  oof        5 folds, shuffled, StratifiedKFold seed 432 (Methods 4.7); folds assigned by row
+             position, rows in the order of the per-building table (README.md, 'Row order')
+  model_cv   XGBoost 100 trees, seed 432, other settings at their defaults; intercept = share of
+             class 1 among the training rows of the fold (base_score: training_label_mean);
+             missing values imputed with the training-fold median (0 for an all-missing column);
              fit_formal_as_class_1: true = formal settlement fitted as class 1 and favela
              probability = 1 - p, false = favela fitted as class 1
              (favela_xai.model.oof_predictions)

@@ -17,16 +17,16 @@ the clusters.
 ## Main results
 
 * The labels are only weakly recovered: mean best adjusted Rand index at most
-  0.08 and mean best balanced accuracy 0.63 to 0.65, against 0.904 for the
-  supervised classifier; mean score AUC 0.55 to 0.63, against 0.969 (02, 03).
+  0.09 and mean best balanced accuracy 0.63 to 0.65, against 0.904 for the
+  supervised classifier; mean score AUC 0.55 to 0.64, against 0.970 (02, 03).
 * The label-free contrast differs from the supervised attribution: convexity
   is among the three most separating indicators in every site, the two
   rankings are negatively correlated on average (Spearman's ρ = −0.36), share
   their leading indicator in none of the ten sites, and the cluster contrast
   has no consistent direction across sites (mean pairwise cosine −0.10; 01).
 * A gradient at the boundary remains: the pooled profile of the cluster score
-  correlates with the supervised profile (r = 0.879, 0.942, 0.952 for the three
-  weightings), with an inside-outside step of 0.17 to 0.48 SD of the score
+  correlates with the supervised profile (r = 0.865, 0.956, 0.960 for the three
+  weightings), with an inside-outside step of 0.16 to 0.51 SD of the score
   (01, 02).
 
 ## Run order

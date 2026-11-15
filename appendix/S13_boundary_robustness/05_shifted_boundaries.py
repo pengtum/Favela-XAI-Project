@@ -227,8 +227,8 @@ def main() -> None:
             gf, gn = pooled_sum.loc[(kind, f, "G_fav")], pooled_sum.loc[(kind, f, "G_non")]
             print(f"  {kind:4s} {f:28s} G_fav {gf.real_geom_value:+.3f} ({gf.real_geom_percentile:5.1f})   "
                   f"G_non {gn.real_geom_value:+.3f} ({gn.real_geom_percentile:5.1f})")
-    print("Reported in SI S13 / ED Fig. 5: |dS| 2.44 vs 1.30 and 1.70 vs 0.29; max slope 0.135 vs 0.073 and 0.084 vs 0.030; "
-          "label step |dS| 1.00 vs 0.17, max slope 0.093 vs 0.013; w 4.1 / 16.7 / 15.7 m.")
+    print("Reported in SI S13 / ED Fig. 5: |dS| 2.39 vs 1.29 and 1.71 vs 0.31; max slope 0.137 vs 0.073 and 0.082 vs 0.029; "
+          "label step |dS| 1.00 vs 0.17, max slope 0.093 vs 0.013; w 4.1 / 16.7 / 15.1 m.")
 
 
 if __name__ == "__main__":

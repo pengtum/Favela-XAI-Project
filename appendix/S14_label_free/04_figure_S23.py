@@ -5,7 +5,7 @@ Manuscript item: SI Fig. S23.
   under the three weightings (orange) and of the supervised favela probability
   (blue, dashed) against signed distance to the 2013 boundary, each normalised
   to 1 in the favela interior and 0 in the formal-settlement interior; r,
-  correlation with the supervised profile (0.88, 0.94, 0.95).
+  correlation with the supervised profile (0.865, 0.956, 0.960; SI Table S18).
 * b: per-site balanced accuracy against the favela labels, for the supervised
   classifier under five-fold cross-validation (SI S12 pipeline; per-site mean
   over the five folds) and for the best label-free clustering of the same site

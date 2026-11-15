@@ -17,9 +17,9 @@ per-site model are held fixed; nothing is refitted.
 
 ## Main results
 
-* The contrast travels with the real boundary: plateau contrast |ΔS| of 2.44
-  (mean interbuilding distance) and 1.70 (adjacency) on the real line, against
-  at most 1.30 and 0.29 on the twenty shifted boundaries; for mean
+* The contrast travels with the real boundary: plateau contrast |ΔS| of 2.39
+  (mean interbuilding distance) and 1.71 (adjacency) on the real line, against
+  at most 1.29 and 0.31 on the twenty shifted boundaries; for mean
   interbuilding distance, adjacency and average weighted distance the
   within-class gradient of the favela-labelled buildings (within 10 m of the
   line against 25-40 m inside it) on the real line exceeds that of all twenty
@@ -30,9 +30,9 @@ per-site model are held fixed; nothing is refitted.
   sites for the five leading indicators (03).
 * Buildings on the line (4,110 straddling, a further 6,742 near-line): with
   these buildings excluded or the polygons shifted by 2.5 m, x0 stays within
-  +0.8 to +6.8 m (mean interbuilding distance, adjacency, perimeter wall),
-  −0.3 to +1.3 m (squareness) and −6.3 to −5.2 m (average weighted distance);
-  polygon shifts of 2.5 to 10 m change |ΔS| by at most 0.12 (02, 06, 08).
+  +0.8 to +6.6 m (mean interbuilding distance, adjacency, perimeter wall),
+  +0.4 to +1.2 m (squareness) and −6.5 to −5.4 m (average weighted distance);
+  polygon shifts of 2.5 to 10 m change |ΔS| by at most 0.11 (02, 06, 08).
 
 ## Run order
 

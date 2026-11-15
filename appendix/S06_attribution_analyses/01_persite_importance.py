@@ -86,7 +86,9 @@ def main() -> None:
         ax.axis("off")
     fig.legend(handles=[Patch(fc=DIMENSION_COLOURS[g], label=g) for g in DIMENSIONS],
                loc="lower center", ncol=5, fontsize=8, frameon=False, bbox_to_anchor=(0.5, -0.005))
-    fig.tight_layout(rect=[0, 0.03, 1, 1])
+    fig.suptitle("Per-site deep-feature importance (favela buildings only); features share one order "
+                 "(overall cross-site importance), bars coloured by morphometric dimension", fontsize=8.2, y=1.0)
+    fig.tight_layout(rect=[0, 0.03, 1, 0.97])
     save_pdf(fig, out / FIGURE)
     plt.close(fig)
     print(f"[saved] {out / TABLE}\n[saved] {out / FIGURE}")

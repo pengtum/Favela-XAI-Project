@@ -8,12 +8,13 @@ Manuscript items
   and w.
 * Fig. 4: data of the 25 panels (drawn by 02_figure4.py).
 * SI Table S5: all values (written by 03_table_S5.py).
-* SI Section S6: x0 = +4.7 m (mean interbuilding distance), +4.2 m
-  (adjacency), +4.9 m (perimeter wall), +3.0 m (squareness), widths of about
-  16-18 m, average weighted distance changing sign about 6 m inside.
+* SI Section S6: x0 = +4.5 m (mean interbuilding distance), +4.3 m
+  (adjacency), +5.0 m (perimeter wall), +2.8 m (squareness), widths of about
+  15-18 m, average weighted distance changing sign about 6 m inside.
 * Results 2.3: the signature shifts gradually across the boundary; the
-  transition is led by the spatial-distribution indicators, which change sign a
-  few metres outside the polygon.
+  transition is led by mean interbuilding distance and adjacency, the two
+  leading spatial-distribution indicators, which change sign a few metres
+  outside the polygon.
 
 Definitions (config.yaml, sections 'signed_distance' and 'boundary_profiles')
 * Signed distance: Euclidean distance from the building centroid to the nearest

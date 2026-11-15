@@ -14,7 +14,7 @@ Manuscript items
      blocks without buffer, 250 m blocks with the 200 m buffer and five k-means folds
      (scored folds only), and three prediction tasks, which are not scored: T1 the test
      set of a random 80/20 split, here the split of the main per-site models (Main Methods
-     4.4: stratified, seed 42), T2 a held-out favela component (every group), T3 a
+     4.4: unstratified, seed 432), T2 a held-out favela component (every group), T3 a
      held-out site with the other nine sites as training data;
   b  error rate of the out-of-fold predictions by distance to the nearest training
      building (random five-fold; 100-1,000 m blocks without and with the 200 m buffer;
@@ -174,7 +174,7 @@ for site in SITES:
         is_test = pd.read_csv(split_file).set_index("uID").is_test.reindex(d.table.uID).to_numpy(bool)
         tr, te = np.where(~is_test)[0], np.where(is_test)[0]
     else:
-        tr, te = main_split(d.y, cfg)
+        tr, te = main_split(d.y, cfg, d.table["uID"].to_numpy())
     curves.append(pd.DataFrame({"site": site, "curve": "T1_random80_20",
                                 "d": cKDTree(d.xy[tr]).query(d.xy[te], k=1)[0]}))
     splits, codes, _ = C.component_splits(C.load_groups(P, site))  # T2: every held-out favela component

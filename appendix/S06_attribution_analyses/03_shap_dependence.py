@@ -148,6 +148,8 @@ def main() -> None:
     fig.legend(handles=gleg, loc="upper center", ncol=5, fontsize=12.5, bbox_to_anchor=(0.5, 0.965),
                title="morphometric dimension (panel-frame colour) — groups & within-group features "
                      "ordered by mean |SHAP|", title_fontsize=11.5)
+    fig.suptitle("Deep-feature SHAP dependence for all 25 morphological indicators (x = feature value, y = SHAP, "
+                 "positive $\\rightarrow$ favela; all ten sites)", fontsize=13.5, y=1.0)
     fig.tight_layout(rect=[0, 0.028, 1, 0.95])
     save_pdf(fig, out / FIGURE, dpi=350)
     plt.close(fig)

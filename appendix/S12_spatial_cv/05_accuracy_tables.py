@@ -8,10 +8,10 @@ Manuscript items
 * SI Table S14 (fold-level summary) -> tables/table_R1_spatialcv_folds.tex
 * the values plotted in SI Fig. S19 (scored_grid.csv, scored_designs.csv; drawn by 06)
 * the accuracy values of SI S12, Results 2.1 and the Discussion (in_text_numbers.txt),
-  e.g. balanced accuracy 0.644 (0.582-0.714; nine sites) for 250 m blocks with the
-  200 m buffer against 0.898 for the random 80/20 split, the decomposition of that
-  decline, the held-out favela component (0.650 / 0.628) and the pooled
-  leave-site-out (0.702).
+  e.g. balanced accuracy 0.645 (0.584-0.714; nine sites) for 250 m blocks with the
+  200 m buffer against 0.895 for the random 80/20 split, the decomposition of that
+  decline, the held-out favela component (0.651 / 0.629) and the pooled
+  leave-site-out (0.695).
 
 Scoring (Main Methods 'Validation under spatial separation'; SI S12 'Scoring';
 ``spatial_cv.scoring``): a fold is used only if its training set holds at least 50
@@ -433,28 +433,28 @@ comp = {b: Bi[("component", None, b)] for b in COMP_B}
 lines = [
     "SI S12 in-text numbers (both scoring criteria unless stated)",
     f"250 m blocks, no buffer: {C.ci3(p0, 'balanced_accuracy')}; {int(p0.n_sites)} sites, {int(p0.n_used_final)} folds "
-    "(manuscript 0.777 (0.731-0.827); ten sites, 150 folds)",
+    "(manuscript 0.772 (0.727-0.822); ten sites, 150 folds)",
     f"250 m blocks, 200 m buffer: {C.ci3(p2, 'balanced_accuracy')}; {int(p2.n_sites)} sites, {int(p2.n_used_final)} of "
     f"{int(p2.n_fold_rows)} folds; first criterion alone {p2.first_balanced_accuracy:.3f} over {int(p2.first_n_sites)} sites "
-    "(manuscript 0.644 (0.582-0.714); nine sites, 129 of 150; 0.642 over ten)",
+    "(manuscript 0.645 (0.584-0.714); nine sites, 129 of 150; 0.643 over ten)",
     f"sites not scored under the primary design: {', '.join(sorted(set(cp.site_name)))}; favela coverage per placement "
     + ", ".join(f"{100 * v:.0f}%" for v in cp.sort_values('grid_placement').coverage) + " (manuscript Palmeiras 4-11%)",
     f"random 80/20 split (refitted): {C.ci3(rA, 'balanced_accuracy')}, AUC {rA.auc:.3f}; random five-fold "
-    f"{C.ci3(rF, 'balanced_accuracy')}, AUC {rF.auc:.3f} (manuscript 0.898 / 0.967, 0.904 / 0.969)",
+    f"{C.ci3(rF, 'balanced_accuracy')}, AUC {rF.auc:.3f} (manuscript 0.895 / 0.966, 0.904 / 0.970)",
     f"other block sizes >= {PRIM_L} m, shapes and rules at {PRIM_B} m: {min(vals):.3f}-{max(vals):.3f}; matched controls "
-    f"{min(ctls):.3f}-{max(ctls):.3f} (manuscript 0.644-0.698 against 0.708-0.791)",
+    f"{min(ctls):.3f}-{max(ctls):.3f} (manuscript 0.645-0.699 against 0.708-0.789)",
     f"decomposition over {int(d.n_sites)} sites: {d.step_R:.3f} -> {d.step_B0:.3f} -> {d.step_C:.3f} -> {d.step_B200:.3f}; "
     f"smaller training set {d.smaller_training_set:+.3f} ({d.smaller_training_set_ci_lo:+.3f} to "
     f"{d.smaller_training_set_ci_hi:+.3f}); spatial share {100 * d.spatial_share:.0f}% of the total {d.total:+.3f}; "
     f"block hold-out {d.block_hold_out:+.3f}; lost neighbouring context {d.lost_neighbouring_context:+.3f} "
-    "(manuscript 0.907 -> 0.790 -> 0.780 -> 0.644; -0.010 (-0.014 to -0.005); 96% of 0.263; -0.117; -0.136)",
+    "(manuscript 0.903 -> 0.785 -> 0.779 -> 0.645; -0.006 (-0.010 to -0.003); 98% of 0.258; -0.118; -0.134)",
 ] + [f"held-out favela component, {b} m buffer: {C.ci3(comp[b], 'balanced_accuracy')}; {int(comp[b]['n_sites'])} sites, "
      f"{int(comp[b]['n_used_final'])} groups" for b in COMP_B] + [
-    "(manuscript 0.650 (0.577-0.726), eight sites, 58 groups; 0.628 (0.575-0.678), seven sites, 56 groups)"]
+    "(manuscript 0.651 (0.578-0.729), eight sites, 58 groups; 0.629 (0.577-0.679), seven sites, 56 groups)"]
 if LOSO is not None:
     rl = Bi[("loso_pooled", None, None)]
     lines.append(f"pooled leave-site-out: {C.ci3(rl, 'balanced_accuracy')}, AUC {rl['auc']:.3f} "
-                 "(manuscript 0.702 (0.627-0.787), AUC 0.788)")
+                 "(manuscript 0.695 (0.618-0.781), AUC 0.781)")
 (OUT / "in_text_numbers.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
 for ln in lines:
     log(ln)

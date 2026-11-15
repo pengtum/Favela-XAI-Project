@@ -10,9 +10,9 @@ tests with site-identity permutations, Benjamini-Hochberg correction).
 | Item | Script |
 |---|---|
 | SI Fig. S11: 10 × 10 transfer balanced-accuracy matrix (rows = training site, columns = target site) | 01 |
-| SI Section S8 and Discussion: mean cross-site balanced accuracy over the 90 ordered pairs 0.574 (site-bootstrap 95% CI 0.529-0.649) against 0.896 within sites; 24 of 90 pairs below chance | 01 |
+| SI Section S8 and Discussion: mean cross-site balanced accuracy over the 90 ordered pairs 0.573 (site-bootstrap 95% CI 0.528-0.649) against 0.896 within sites; 22 of 90 pairs below chance | 01 |
 | Table of all 100 ordered pairs (accuracy, balanced accuracy and AUC); its balanced accuracies are the values of SI Fig. S11 | 01 |
-| SI Fig. S12 and SI Section S8: Mantel correlation of transfer with seven between-site measures; similarity of the favela-formal contrast is the strongest (r = 0.59, BH q < 0.001) | 02 |
+| SI Fig. S12 and SI Section S8: Mantel correlation of transfer with seven between-site measures; similarity of the favela-formal contrast is the strongest (r = 0.57, BH q = 0.002) | 02 |
 | Methods, "Cross-site classifier transferability" | 01, 02 |
 
 ## Run order
@@ -29,12 +29,12 @@ Both scripts require all ten sites.
 ## Inputs
 
 - `products.features_gpkg` (`main/01_features`): label and the 25 indicators of every building.
-- `products.model_json` (`main/02_classification`): the main per-site models (XGBoost, 200 trees, max depth 6, learning rate 0.1, seed 42).
+- `products.model_json` (`main/02_classification`): the main per-site models (XGBoost, 100 trees, max depth 6, learning rate 0.3, seed 432; `model_main`).
 - `products.shap_gpkg` (`main/02_classification`; script 02): the 25 Tree-SHAP columns (positive = toward favela).
 - `products.site_metrics` (`main/02_classification`; optional): SI Table S3, used to check the diagonal accuracy.
 
 The held-out test split of each site is re-derived with
-`favela_xai.model.main_split` (stratified 80/20, seed 42), as in
+`favela_xai.model.main_split` (unstratified 80/20, seed 432, drawn on the buildings in uID order), as in
 `main/02_classification`.
 
 ## Outputs (`outputs/appendix/S08_transfer/`)

@@ -4,8 +4,8 @@ Manuscript items
 * SI Table S5 (SI Section S6): |dS|, x0 and w of every indicator, rows ordered
   by |dS|; x0 and w only where |dS| >= 0.1 (Methods 4.8).
 * SI Section S6: the x0 values of the four leading indicators (mean
-  interbuilding distance +4.7 m, adjacency +4.2 m, perimeter wall +4.9 m,
-  squareness +3.0 m), their widths (about 16-18 m) and the sign change of
+  interbuilding distance +4.5 m, adjacency +4.3 m, perimeter wall +5.0 m,
+  squareness +2.8 m), their widths (about 15-18 m) and the sign change of
   average weighted distance about 6 m inside; printed at the end of the run.
 
 The table rows are computed; the caption is the fixed SI Table S5 caption.
@@ -34,7 +34,7 @@ is the boundary-discriminative \emph{strength} (deep-inside minus deep-outside S
 \emph{sign-flip distance} where $S$ crosses zero
 ($x_0>0$ = outside the legal line); $w$
 is the $|S'|$-weighted transition \emph{width} (small = sharp, large = graded). $x_0$ and $w$ are reported only where a
-transition is resolved ($|\Delta S|\ge0.1$); for the remaining indicators the profile is essentially flat. Rows are
+transition is resolved ($|\Delta S|\ge0.1$ before rounding); for the remaining indicators the profile is essentially flat. Rows are
 ordered by $|\Delta S|$.}"""
 
 # Indicators whose x0 and w are quoted in the SI Section S6 text

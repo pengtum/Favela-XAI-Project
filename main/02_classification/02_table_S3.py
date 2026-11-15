@@ -12,7 +12,9 @@ Manuscript items
 
 Metrics (favela_xai.model.classification_metrics): accuracy; precision, recall
 and F1 with favela as the positive class; macro-averaged F1 over the two
-classes; computed on the held-out 20% test buildings of each site (is_test).
+classes; computed on the held-out 20% test buildings of each site (is_test) of
+the main per-site models of 01_train_models.py (Methods 4.4: xgboost defaults,
+100 trees, seed 432; unstratified 80/20 split with seed 432).
 
 Inputs
   outputs/main/02_classification/<site>_buildings_shap.gpkg   products.shap_gpkg (01_train_models.py)
@@ -79,16 +81,16 @@ def main() -> None:
     f1 = t["f1_favela"]
     summary = [
         f"mean test accuracy over {len(t)} sites: {t['accuracy'].mean():.3f} "
-        f"(Results 2.1 '93.3%'; Main Fig. 2b 'mean 0.933')",
-        f"per-site F1 (favela): {f1.min():.2f}-{f1.max():.2f} (Results 2.1 '0.79-0.98')",
+        f"(Results 2.1 '91.6%'; Main Fig. 2b 'mean 0.916')",
+        f"per-site F1 (favela): {f1.min():.2f}-{f1.max():.2f} (Results 2.1 '0.77-0.98')",
         f"highest accuracy: {cfg.site_name(acc.index[0])} {acc.iloc[0]:.3f} (Results 2.1: Rocinha 0.977)",
         "lowest accuracies: " + ", ".join(f"{cfg.site_name(s)} {acc[s]:.3f}" for s in acc.index[-2:][::-1])
-        + " (Results 2.1: Nova Cidade 0.881, Grotao de Costa Barros 0.866)",
+        + " (Results 2.1: Nova Cidade 0.876, Grotao de Costa Barros 0.818)",
         "F1 (favela) of the SI S4 text: " + ", ".join(
             f"{cfg.site_name(s)} {f1[s]:.3f}" for s in ("rocinha", "nova_cidade", "grotao_de_costa_barros") if s in f1)
-        + " (SI S4: 0.980, 0.788, 0.852)",
+        + " (SI S4: 0.979, 0.772, 0.803)",
         "means of the other columns: " + ", ".join(f"{m} {t[m].mean():.3f}" for m in METRICS[1:])
-        + " (SI Table S3 mean row: 0.896, 0.910, 0.903, 0.923)",
+        + " (SI Table S3 mean row: 0.896, 0.858, 0.876, 0.902)",
         f"test buildings: {int(t['n_test'].sum()):,} (favela share per site "
         f"{t['favela_share_test'].min():.2f}-{t['favela_share_test'].max():.2f})",
     ]

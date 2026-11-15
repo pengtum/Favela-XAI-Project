@@ -83,8 +83,8 @@ def main_outputs(cfg, site: str, geometry: bool = False, extra=()):
 
     The test flag is read from the table (main/02_classification writes
     ``is_test``); for a table without one it is re-derived with
-    favela_xai.model.main_split on the labels in the row order of the table,
-    which is how the main models draw their split.
+    favela_xai.model.main_split on the labels, with the rows ordered by uID
+    (as the main models draw their split; table order if the table has no uID).
     """
     path = cfg.require_product("shap_gpkg", site=site)
     fields = set(pyogrio.read_info(path)["fields"])
@@ -109,7 +109,7 @@ def main_outputs(cfg, site: str, geometry: bool = False, extra=()):
     elif test_col is not None:
         out["is_test"] = raw[test_col].astype(bool).to_numpy()
     else:
-        _, te = main_split(out["is_favela"].to_numpy(int), cfg)
+        _, te = main_split(out["is_favela"].to_numpy(int), cfg, out["uID"].to_numpy() if "uID" in out else None)
         flag = np.zeros(len(out), dtype=bool)
         flag[te] = True
         out["is_test"] = flag

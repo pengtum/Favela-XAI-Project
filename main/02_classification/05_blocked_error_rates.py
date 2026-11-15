@@ -3,8 +3,8 @@
 Manuscript items
   * Results 2.1, SI Sections S5 and S12: with whole neighbourhoods withheld
     from training (250 m blocks, 200 m buffer) the misclassification rate
-    within 6 m of the official boundary is 51.3% against 15.4% at 90 m or
-    more (ratio 3.3, 95% confidence interval 2.0-6.6), higher near the line
+    within 6 m of the official boundary is 51.6% against 15.5% at 90 m or
+    more (ratio 3.3, 95% confidence interval 2.0-6.5), higher near the line
     than far from it in all nine scored sites.
   * Methods 4.7: the same conditional rates under the spatially blocked
     designs of Methods 4.5.
@@ -193,8 +193,8 @@ def main() -> None:
         print(f"{r.design:28s} {r.criterion:36s} {100 * r.rate_near:5.1f}% within 6 m vs {100 * r.rate_far:5.1f}% "
               f"at 90 m or more; ratio {r.ratio_near_far:.2f} ({r.ratio_boot_lo:.2f}-{r.ratio_boot_hi:.2f}); "
               f"near > far in {r.sites_near_exceeds_far} of {r.sites_evaluable} sites ({r.n_sites} scored)")
-    print("Results 2.1 / SI S5 / SI S12 (250 m blocks, 200 m buffer, both criteria): 51.3% vs 15.4%, "
-          "ratio 3.3 (2.0-6.6), nine scored sites")
+    print("Results 2.1 / SI S5 / SI S12 (250 m blocks, 200 m buffer, both criteria): 51.6% vs 15.5%, "
+          "ratio 3.3 (2.0-6.5), nine scored sites")
 
 
 if __name__ == "__main__":

@@ -17,7 +17,8 @@ Tree SHAP (log-odds contributions, positive toward favela). Runs
                         site (split seeds 7, 99, 2024), Tree SHAP of every building of the site;
                         spatial_cv.ranking.null_classifier selects the model:
                           model_cv    validation-pipeline model on an unstratified split
-                          model_main  main per-site model of Methods 4.4 on a stratified split
+                          model_main  main per-site model of Methods 4.4 on a split drawn as
+                                      in model_main (unstratified)
   component_b0, _b200   held-out favela component without and with the 200 m buffer
   hex250_b200, kmm250_b200, sq250_K10_b200   the alternative units at 200 m (first placement)
   control_sq250_b200_p<r>  size-matched control: the same test folds, the buffer's number of
@@ -49,14 +50,14 @@ from sklearn.model_selection import train_test_split
 
 from favela_xai import spatial_cv as scv
 from favela_xai.attribution import tree_shap
-from favela_xai.model import cv_classifier, fit_predict_cv, impute_training_median, main_classifier
+from favela_xai.model import fit_classifier, fit_predict_cv, formal_as_class_1, impute_training_median
 
 import s12_common as C
 
 cfg, s, P = C.setup(__file__)
 RK = C.section(cfg)["ranking"]
 SR = cfg.section("spatial_cv")["ranking"]
-FORMAL_AS_1 = bool(cfg.get("model_cv.fit_formal_as_class_1", True))   # SHAP of such models is negated
+FORMAL_AS_1 = formal_as_class_1(cfg, "model_cv")   # SHAP of such models is negated
 PRIM_L, PRIM_B = int(cfg.get("spatial_cv.primary.block_m")), int(cfg.get("spatial_cv.primary.buffer_m"))
 CTL_L, CTL_B = int(RK["control_design"]["block_m"]), int(RK["control_design"]["buffer_m"])
 PLACEMENTS = list(range(int(cfg.get("spatial_cv.grid_placements"))))
@@ -168,15 +169,11 @@ def run_null(site, run, spec, d, main, n_jobs):
                               stratify=d.y if ref["stratify"] else None, random_state=seed)
     Xtr, Xall = impute_training_median(d.X[itr], d.X)
     if NULL_CLASSIFIER == "model_main":
-        # Methods 4.4 model: favela = class 1, SHAP already positive toward favela
-        model = main_classifier(cfg)
-        if n_jobs is not None:
-            model.set_params(n_jobs=n_jobs)
-        model.fit(Xtr, d.y[itr])
-        S_all = tree_shap(model, Xall, negate=False)
+        # Methods 4.4 model, in its class coding; SHAP negated when formal settlement is class 1
+        model = fit_classifier(cfg, "model_main", Xtr, d.y[itr], n_jobs)
+        S_all = tree_shap(model, Xall, negate=formal_as_class_1(cfg, "model_main"))
     else:
-        model = cv_classifier(cfg, n_jobs).set_params(random_state=int(SR["null_model_seed"]))
-        model.fit(Xtr, 1 - d.y[itr] if FORMAL_AS_1 else d.y[itr])
+        model = fit_classifier(cfg, "model_cv", Xtr, d.y[itr], n_jobs, random_state=int(SR["null_model_seed"]))
         S_all = tree_shap(model, Xall, negate=FORMAL_AS_1)
     every = np.arange(d.n)
     rec = fold_record(site, run, 0, d.y, itr, every, 0, "ok",

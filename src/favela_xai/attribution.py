@@ -13,10 +13,10 @@ Manuscript items
   contribution toward favela (Main Fig. 3).
 
 Sign convention: positive SHAP values push a building toward the favela class
-(orange in Main Figs 3-4). The main models code favela as class 1, so their
-raw Tree-SHAP values already follow this convention; models trained with
-formal settlement as class 1 (validation pipeline) are negated with
-``negate=True``.
+(orange in Main Figs 3-4). Models fitted with formal settlement as class 1
+(``fit_formal_as_class_1`` of model_main and model_cv, the coding of the
+analysed models) are negated with ``negate=True``; a model fitted with favela
+as class 1 already follows this convention.
 """
 from __future__ import annotations
 

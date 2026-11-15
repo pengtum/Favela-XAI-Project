@@ -8,14 +8,16 @@ Manuscript items
 * SI S9 (comparison of classification quality) and the mean per-site AUC of k
   and of the 25 indicators quoted in the Discussion.
 
-Protocol (config.yaml ``block_complexity.persite``, ``model_main``,
+Protocol (config.yaml ``block_complexity.persite``, ``block_complexity.classifier``,
 ``pca.raw_benchmark``)
 * Evaluation subset: the buildings of each site with a valid k, complete
   Tree-SHAP attributions and all 25 raw indicators (k_common.evaluation_subset).
 * 80/20 train/test split stratified by label, random seed 42.
 * XGBoost with 200 trees, max depth 6, learning rate 0.1, random seed 42
-  (Methods 4.4, favela_xai.model.main_classifier); one model per site and
-  feature set; favela = class 1; predicted class = P(favela) > 0.5.
+  (``block_complexity.classifier``, the classifier of the SI S9 comparison,
+  not the main per-site model of Methods 4.4); one model per site and
+  feature set; favela = class 1; intercept = favela share of the training
+  rows (``base_score: training_label_mean``); predicted class = P(favela) > 0.5.
 * PC1 + PC2 of the raw 25 indicators: a two-component PCA (seed 42) of the
   unstandardised 25 raw indicators, fitted within each site on its whole
   evaluation subset.
@@ -45,7 +47,7 @@ from sklearn.model_selection import train_test_split
 
 from favela_xai.config import load_config
 from favela_xai.io import write_table, write_text
-from favela_xai.model import main_classifier
+from favela_xai.model import fit_classifier
 from k_common import RAW, evaluation_subset, read_k, site_table, tex_number
 
 # feature set -> (row label of SI Table S6, number of features)
@@ -58,7 +60,7 @@ FEATURE_SETS = {
 
 def table_tex(summary: pd.DataFrame, cfg) -> str:
     """SI Table S6 in LaTeX (caption values from config.yaml)."""
-    m = cfg.section("model_main")
+    m = cfg.section("block_complexity.classifier")
     ps = cfg.section("block_complexity")["persite"]
     test_pct = int(round(100 * float(ps["test_size"])))
     lines = [
@@ -97,8 +99,8 @@ def main() -> None:
     ps = cfg.section("block_complexity")["persite"]
     s9 = cfg.section("appendix_S09_block_complexity_k")
     raw_pca = cfg.section("pca")["raw_benchmark"]
-    if ps["classifier"] != "model_main":
-        raise ValueError("SI Table S6 uses the main classifier settings (200 trees, depth 6, lr 0.1, seed 42)")
+    if ps["classifier"] != "block_complexity.classifier":
+        raise ValueError("SI Table S6 uses block_complexity.classifier (200 trees, depth 6, lr 0.1, seed 42)")
     if raw_pca["standardise"] or not raw_pca["per_site"]:
         raise ValueError("SI S9: the raw two-component summary is fitted within each site without standardising")
     digits = int(s9["round_site_metrics"])
@@ -121,7 +123,7 @@ def main() -> None:
                                   random_state=int(ps["split_random_state"]))
         line = dict(site=site, n_evaluation=len(g), n_train=len(tr), n_test=len(te))
         for name in FEATURE_SETS:
-            clf = main_classifier(cfg).fit(X[name][tr], y[tr])
+            clf = fit_classifier(cfg, "block_complexity.classifier", X[name][tr], y[tr])
             pred = clf.predict(X[name][te])
             proba = clf.predict_proba(X[name][te])[:, 1]
             line[f"acc_{name}"] = round(accuracy_score(y[te], pred), digits)

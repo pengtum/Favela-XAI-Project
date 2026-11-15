@@ -40,5 +40,10 @@ files are stored elsewhere.
 All intermediate and final results (per-building indicators, signed distances,
 fitted classifiers, Tree-SHAP attributions, out-of-fold predictions and the
 tables and figures) are written by the scripts to `outputs/`, which is not part
-of the repository. Derived per-building data are available from the
-corresponding author upon reasonable request.
+of the repository. The derived per-building data of the analysis (label,
+held-out split, predictions, the 25 morphological indicators, Tree-SHAP
+attributions and signed distance to the official 2013 boundary of each of the
+188,292 buildings, with the per-building input tables read by this code) are
+provided to the editor and reviewers with the submission and will be deposited
+in a public repository with a DOI upon publication (see the paper's Data
+availability statement).

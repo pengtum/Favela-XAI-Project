@@ -1,9 +1,9 @@
 """Step 12: direction of the attributions under spatial blocking (SI S12, last paragraph of 'Stability').
 
 Manuscript items: the direction-survival values of SI S12 'Stability of the
-attributions': the three leading indicators keep their main-text sign in 73 of 81
-site-indicator-placement combinations (site mean 0.90, 0.83-0.96), the five leading
-indicators in 126 of 135 (0.93, 0.87-0.98), and the indicators in which the mismatches
+attributions': the three leading indicators keep their main-text sign in 74 of 81
+site-indicator-placement combinations (site mean 0.91, 0.84-0.98), the five leading
+indicators in 124 of 135 (0.92, 0.84-0.98), and the indicators in which the mismatches
 occur.
 
 Direction of indicator j in a site = sign of Spearman's correlation, over favela
@@ -105,7 +105,7 @@ for sc, col in (("both criteria (primary)", "scored_both"), ("first criterion on
             lines.append(f"top {k}: {kept} of {pairs} site-indicator-placement combinations; site mean {m:.2f} "
                          f"({lo:.2f}-{hi:.2f}), {n} sites")
 pd.DataFrame(summ).to_csv(OUT / "direction_summary.csv", index=False)
-lines.append("(manuscript: 73 of 81, 0.90 (0.83-0.96); 126 of 135, 0.93 (0.87-0.98))")
+lines.append("(manuscript: 74 of 81, 0.91 (0.84-0.98); 124 of 135, 0.92 (0.84-0.98))")
 top5 = D[D.scored_both & (D.rank_main <= max(TOPK))]
 mm = top5[~top5.same]
 mm.to_csv(OUT / "direction_mismatches.csv", index=False)

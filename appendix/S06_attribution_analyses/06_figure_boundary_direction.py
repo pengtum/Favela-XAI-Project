@@ -53,7 +53,7 @@ def main() -> None:
     xmax = float(settings(cfg)["direction"]["figure_xlim"])
 
     figure_style(8)
-    fig, ax = plt.subplots(figsize=(6.2, 3.9))
+    fig, ax = plt.subplots(figsize=(7.4, 4.02))
     ys = list(range(len(sites))) + [len(sites) + 1]              # one blank row before the mean
     inward = list(sites["inward_pct"]) + [mean["inward_pct"]]
     outward = list(sites["outward_pct"]) + [mean["outward_pct"]]
@@ -83,23 +83,23 @@ def main() -> None:
     ax.set_xticks(ticks)
     ax.set_xticklabels([str(abs(int(t))) for t in ticks], fontsize=8.5)
     ax.set_xlabel("displacement of the near-boundary group from its own reference class  (%)", fontsize=9.0)
-    ax.tick_params(axis="y", length=0)
+    ax.tick_params(axis="y", left=False)
     ax.spines["left"].set_visible(False)
     ax.spines["bottom"].set_color("black")
     ax.spines["bottom"].set_linewidth(0.7)
 
     # headers above the plot
-    ax.text(-60, 1.02, "← closer to formal", transform=ax.get_xaxis_transform(), ha="left", va="bottom",
+    ax.text(-60, 1.038, "← closer to formal", transform=ax.get_xaxis_transform(), ha="left", va="bottom",
             fontsize=8.0, color=FAVELA_TEXT)
-    ax.text(60, 1.02, "closer to favela →", transform=ax.get_xaxis_transform(), ha="right", va="bottom",
+    ax.text(60, 1.038, "closer to favela →", transform=ax.get_xaxis_transform(), ha="right", va="bottom",
             fontsize=8.0, color=FORMAL_TEXT)
-    ax.text(1.105, 1.02, "net skew", transform=ax.transAxes, ha="center", va="bottom", fontsize=8.0,
+    ax.text(1.105, 1.038, "net skew", transform=ax.transAxes, ha="center", va="bottom", fontsize=8.0,
             color=SKEW_TEXT, fontweight="bold")
 
     fig.legend(handles=[Patch(fc=FAVELA_MAP, label="favela-side buildings (inside the boundary)"),
                         Patch(fc=FORMAL_MAP, label="formal-side buildings (outside the boundary)")],
                loc="lower center", ncol=2, fontsize=8.0, frameon=False, bbox_to_anchor=(0.5, -0.02))
-    fig.tight_layout(rect=[0, 0.06, 0.9, 1])
+    fig.tight_layout(rect=[0, 0.06, 0.973, 1])
     save_pdf(fig, out / FIGURE)
     plt.close(fig)
     print(f"[saved] {out / FIGURE}")

@@ -7,8 +7,11 @@ in Results 2.1, and Supplementary Data 1-2 (per-fold record, Table S14 caption).
 
 Every fit uses the validation-pipeline classifier (SI S12 'Designs'; Main Methods
 'Validation under spatial separation'): XGBoost with 100 trees and seed 432, other
-settings at their defaults, missing indicator values imputed with the median of
-the fold's training rows (``model_cv``; favela_xai.model).
+settings at their defaults (the settings of the main per-site models), intercept
+= share of class 1 among the fold's training rows (``model_cv.base_score``),
+missing indicator values imputed with the median of the fold's training rows
+(``model_cv``; favela_xai.model). Units, folds and random draws are assigned by
+row position, in the row order of the per-building tables (main/01_features).
 
 Jobs (one shard per site and job; existing shards are skipped, so the script can
 be re-run until everything is done):

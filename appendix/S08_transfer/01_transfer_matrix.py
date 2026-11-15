@@ -12,9 +12,10 @@ Design (SI S8; config.yaml ``transfer`` and ``appendix_S08_transfer``)
 * Row i = training site (classifier applied); column j = target site (test
   split scored); the diagonal holds the within-site test results (SI Table S3).
 * Classifiers: the main per-site models of main/02_classification (XGBoost,
-  200 trees, max depth 6, learning rate 0.1, seed 42).
-* Target test split: stratified 80/20 split (seed 42) of the target site,
-  re-derived with favela_xai.model.main_split as in main/02_classification.
+  100 trees, max depth 6, learning rate 0.3, seed 432; config ``model_main``).
+* Target test split: unstratified 80/20 split (seed 432) of the target site,
+  drawn on its buildings in uID order and re-derived with
+  favela_xai.model.main_split as in main/02_classification.
 * ``transfer.target_imputation``: target_training_medians (missing values of
   the target test rows filled with the target site's training medians) |
   source_training_medians (with those of the applied model's site).
@@ -63,7 +64,7 @@ from favela_xai.config import load_config  # noqa: E402
 from favela_xai.features import MODEL_FEATURE_ORDER  # noqa: E402
 from favela_xai.io import read_site_features, write_table, write_text  # noqa: E402
 from favela_xai.labels import label_to_int  # noqa: E402
-from favela_xai.model import main_split  # noqa: E402
+from favela_xai.model import favela_probability, formal_as_class_1, main_split  # noqa: E402
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -97,13 +98,14 @@ def load_test_split(cfg, site: str) -> dict:
     """Held-out test split of one site, raw and imputed with the site's training medians.
 
     The split and the medians are those of favela_xai.model.fit_main_model:
-    main_split on the rows of the per-site building table, and a median
-    SimpleImputer fitted on the training rows (kept for all-missing columns).
+    main_split on the rows of the per-site building table ordered by uID, and
+    a median SimpleImputer fitted on the training rows (kept for all-missing
+    columns).
     """
-    gdf = read_site_features(cfg, site, columns=["label", *MODEL_FEATURE_ORDER])
+    gdf = read_site_features(cfg, site, columns=["uID", "label", *MODEL_FEATURE_ORDER])
     X = pd.DataFrame(gdf[MODEL_FEATURE_ORDER].astype(float).to_numpy(), columns=MODEL_FEATURE_ORDER)
     y = is_favela(gdf["label"])
-    tr, te = main_split(y, cfg)
+    tr, te = main_split(y, cfg, gdf["uID"].to_numpy())
     imputer = SimpleImputer(strategy="median", keep_empty_features=True).fit(X.iloc[tr])
     X_test = X.iloc[te].reset_index(drop=True)
     return dict(X_test_raw=X_test, imputer=imputer,
@@ -112,7 +114,11 @@ def load_test_split(cfg, site: str) -> dict:
 
 
 def load_model(cfg, site: str) -> XGBClassifier:
-    """Main per-site model written by main/02_classification (class 1 = favela)."""
+    """Main per-site model written by main/02_classification.
+
+    Its class 1 is formal settlement when ``model_main.fit_formal_as_class_1``
+    is set; P(favela) is taken with favela_xai.model.favela_probability.
+    """
     model = XGBClassifier()
     model.load_model(cfg.require_product("model_json", site=site))
     return model
@@ -244,6 +250,7 @@ def main() -> None:
 
     splits = {s: load_test_split(cfg, s) for s in sites}
     models = {s: load_model(cfg, s) for s in sites}
+    formal_as_1 = formal_as_class_1(cfg, "model_main")
 
     # ------------------------------------------------------------------ matrix
     BAL = np.full((n, n), np.nan)
@@ -252,7 +259,7 @@ def main() -> None:
         for j, tgt in enumerate(sites):
             X = target_matrix(splits[tgt], splits[s], t["target_imputation"])
             y = splits[tgt]["y_test"]
-            p = models[s].predict_proba(X[MODEL_FEATURE_ORDER])[:, 1]      # P(favela)
+            p = favela_probability(models[s], X[MODEL_FEATURE_ORDER], formal_as_1)      # P(favela)
             yhat = (p >= thr).astype(int)
             BAL[i, j] = balanced_accuracy_score(y, yhat)
             ACC[i, j] = accuracy_score(y, yhat)

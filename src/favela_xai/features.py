@@ -20,10 +20,11 @@ Contents
   average weighted distance from a Delaunay triangulation of the centroids.
 * ``table_s2_body``: the body of SI Table S2 generated from the registry.
 
-The indicator code uses the momepy functional API with libpysal graphs and is
-pinned to momepy 0.8.1 (environment.yml; Methods 4.14: momepy 0.8). Later
-momepy releases (0.11, for example) simplify the tessellation cells by
-default, which changes the cells and the indicators computed on them.
+The indicator code uses the momepy functional API with libpysal graphs. The
+per-building indicator table of the analysis was computed with momepy 0.8
+(Methods 4.14; README, Installation). Later momepy releases (0.11, the version
+in environment.yml, for example) simplify the tessellation cells by default,
+which changes the cells and the indicators computed on them.
 """
 from __future__ import annotations
 
@@ -145,7 +146,11 @@ FEATURES: list[Indicator] = [
               "(not a count of the footprints that touch building i)"),
     Indicator("CAR", "Covered area ratio", "cov-area ratio", "cov-area ratio", "Spatial distribution",
               "building and cell", "building area / area of its own tessellation cell",
-              "CAR(i) = A_i / area(V_i)"),
+              "CAR(i) = A_i / area(V_i)",
+              note="not bounded by 1: where footprints touch or overlap, the boundary between their cells "
+                   "(drawn from the footprints shrunk by tessellation.shrink and discretised at "
+                   "tessellation.segment) can cut into a footprint; 872 of the 188,292 analysed buildings "
+                   "have CAR > 1"),
     # --- Configuration (3) ---
     Indicator("tes_area", "Tessellation cell area", "tess. cell area", r"tess.\ cell area", "Configuration",
               "tessellation cell", "cell area (geopandas .area)", "area(V_i), the area of the cell of building i"),

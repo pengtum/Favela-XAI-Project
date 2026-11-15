@@ -5,7 +5,7 @@ indicators equal', 'Dimensions balanced', 'One component per dimension' (means
 over the ten sites: best ARI and best balanced accuracy over 2-6 clusters and
 over k-means and Ward; score AUC and step in SD of the two-cluster k-means
 score; correlation r of the pooled normalised profiles) and the 'Supervised
-(reference)' row (balanced accuracy 0.904, AUC 0.969).
+(reference)' row (balanced accuracy 0.904, AUC 0.970).
 
 Supervised reference: five-fold cross-validation of the SI S12 pipeline
 (XGBoost, 100 trees, seed 432); balanced accuracy and AUC are the mean over
@@ -89,8 +89,8 @@ def main() -> None:
 
     pd.set_option("display.width", 200)
     print(values.round(3).to_string(index=False))
-    print("Reported in SI Table S18: 0.045/0.628/0.555/0.173/0.879; 0.079/0.646/0.631/0.475/0.942; "
-          "0.057/0.633/0.616/0.442/0.952; supervised 0.904 / 0.969.")
+    print("Reported in SI Table S18: 0.048/0.630/0.553/0.164/0.865; 0.086/0.654/0.635/0.514/0.956; "
+          "0.063/0.632/0.615/0.456/0.960; supervised 0.904 / 0.970.")
     print(f"saved {lf.OUT / 'table_S18_label_free.tex'}")
 
 

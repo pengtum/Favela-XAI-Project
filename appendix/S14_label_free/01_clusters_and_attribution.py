@@ -11,7 +11,7 @@ Manuscript items
   direction across sites (mean pairwise cosine -0.10)
   (cluster_contrast_vs_attribution.csv, cluster_contrast_summary.csv).
 * SI S14 'Results', second paragraph: correlation of the pooled normalised
-  label-free profile (equal weights) with the supervised profile, 0.879 (also
+  label-free profile (equal weights) with the supervised profile, 0.865 (also
   computed, with the other two weightings, by step 2).
 * Per-k alignment of the equal-weight clusters with the labels
   (alignment_all_equal.csv; the best values over k and algorithm enter SI
@@ -145,7 +145,7 @@ def main() -> None:
         ("mean_pairwise_cosine", float(np.nanmean(off)), "SI S14: -0.10"),
         ("min_pairwise_cosine", float(np.nanmin(off)), "log only"),
         ("pooled_profile_correlation_all_equal", lf.profile_correlation(lf.pooled(S), lf.pooled(P)),
-         "SI S14 / Table S18: 0.879"),
+         "SI S14 / Table S18: 0.865"),
         ("midpoint_label_free_m", lf.crossing(ps, 0.5), "log only"),
         ("width_10_90_label_free_m", lf.crossing(ps, 0.1) - lf.crossing(ps, 0.9), "log only"),
         ("midpoint_supervised_m", lf.crossing(pp, 0.5), "log only"),

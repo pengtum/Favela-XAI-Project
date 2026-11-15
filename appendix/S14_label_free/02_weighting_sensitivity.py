@@ -2,15 +2,15 @@
 
 Manuscript items
 * SI Table S18, rows 'All indicators equal', 'Dimensions balanced', 'One
-  component per dimension' (means over the ten sites): best ARI 0.045 / 0.079 /
-  0.057; best balanced accuracy 0.628 / 0.646 / 0.633; score AUC 0.555 / 0.631 /
-  0.616; step 0.173 / 0.475 / 0.442 SD; profile r 0.879 / 0.942 / 0.952
+  component per dimension' (means over the ten sites): best ARI 0.048 / 0.086 /
+  0.063; best balanced accuracy 0.630 / 0.654 / 0.632; score AUC 0.553 / 0.635 /
+  0.615; step 0.164 / 0.514 / 0.456 SD; profile r 0.865 / 0.956 / 0.960
   (weighting_sensitivity.csv, weighting_summary.csv; table: 03_table_S18.py).
-* SI S14 'Results': mean best adjusted Rand index at most 0.08, mean best
-  balanced accuracy 0.63-0.65, mean score AUC 0.55-0.63, inside-outside
-  difference 0.17-0.48 SD of the score; per-site correlation with the
-  supervised profile, median 0.508 (range 0.060-0.834) with equal weights and
-  0.778 (-0.157 to 0.976) under the inverse-square-root weighting
+* SI S14 'Results': mean best adjusted Rand index at most 0.09, mean best
+  balanced accuracy 0.63-0.65, mean score AUC 0.55-0.64, inside-outside
+  difference 0.16-0.51 SD of the score; per-site correlation with the
+  supervised profile, median 0.538 (range 0.013-0.821) with equal weights and
+  0.780 (-0.233 to 0.976) under the inverse-square-root weighting
   (persite_profile_correlation.csv, weighting_summary.csv).
 * Data of SI Fig. S23 (panel a profiles, panel b label-free bars; 04_figure_S23.py).
 
@@ -115,9 +115,9 @@ def main() -> None:
 
     pd.set_option("display.width", 220)
     print("\n" + summary.round(3).to_string(index=False))
-    print("\nReported in SI S14 / Table S18: ARI 0.045/0.079/0.057, bal. acc. 0.628/0.646/0.633, score AUC 0.555/0.631/0.616, "
-          "step 0.173/0.475/0.442, profile r 0.879/0.942/0.952, supervised AUC 0.969; per-site r median "
-          "0.508 (0.060-0.834) equal weights, 0.778 (-0.157 to 0.976) dimensions balanced.")
+    print("\nReported in SI S14 / Table S18: ARI 0.048/0.086/0.063, bal. acc. 0.630/0.654/0.632, score AUC 0.553/0.635/0.615, "
+          "step 0.164/0.514/0.456, profile r 0.865/0.956/0.960, supervised AUC 0.970; per-site r median "
+          "0.538 (0.013-0.821) equal weights, 0.780 (-0.233 to 0.976) dimensions balanced.")
     print("\nScore AUC per site:")
     print(res.pivot(index="site", columns="weighting", values="score_AUC")[lf.WEIGHTINGS]
           .assign(supervised=res.groupby("site")["sup_AUC"].first()).round(3).to_string())

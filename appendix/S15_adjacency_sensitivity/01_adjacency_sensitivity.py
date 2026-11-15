@@ -15,11 +15,11 @@ Manuscript items
                            (indicators.adjacency_contiguity: buildings); the other
                            24 indicators as analysed;
     omitted                the other 24 indicators.
-* Methods 4.3 and SI S15: mean per-site Spearman rho with the reference 0.93
-  (footprint contiguity) and 0.94 (omitted), 0.98 for the pooled ranking in
-  both; sign-change distance x0 of the summed spatial-distribution attributions
-  +4.9, +5.0 and +4.6 m; misclassified within 6 m / at 90 m or more 26.8% / 3.7%
-  (reference, as in Fig. 2c) and 26.4% / 3.6% (footprint contiguity).
+* Methods 4.3 and SI S15: mean per-site Spearman rho with the reference 0.91
+  (footprint contiguity) and 0.95 (omitted), 0.97 and 0.96 for the pooled
+  ranking; sign-change distance x0 of the summed spatial-distribution
+  attributions +4.8, +5.1 and +4.4 m; misclassified within 6 m / at 90 m or more
+  26.8% / 3.7% (reference, as in Fig. 2c) and 26.5% / 3.5% (footprint contiguity).
 
 Definitions (config.yaml)
 * Folds and classifier: sections 'oof' and 'model_cv', through
@@ -489,12 +489,12 @@ def main() -> None:
     else:
         lines.append("reference against products.oof_predictions: not checked (run "
                      "main/02_classification/03_oof_predictions.py first)")
-    lines.append("SI S15 / Table S19 / Methods 4.3: rho 0.93 (0.85-0.98) and 0.94 (0.87-0.99), pooled 0.98 and "
-                 "0.98; at least two of three leading indicators kept in 10 of 10 sites in both, the leading "
+    lines.append("SI S15 / Table S19 / Methods 4.3: rho 0.91 (0.79-0.97) and 0.95 (0.88-0.99), pooled 0.97 and "
+                 "0.96; at least two of three leading indicators kept in 10 of 10 sites in both, the leading "
                  "indicator among the other 24 in every site when the indicator is omitted; x0 / w spatial "
-                 "distribution +4.9 / 16.3, "
-                 "+5.0 / 17.6, +4.6 / 18.3, all indicators +4.3 / 14.0, +4.4 / 15.8, +3.9 / 15.0; dS > 0 in all "
-                 "nine evaluable sites; misclassified 26.8% / 3.7% (reference) and 26.4% / 3.6% (footprint "
+                 "distribution +4.8 / 16.7, "
+                 "+5.1 / 17.7, +4.4 / 18.3, all indicators +4.2 / 14.4, +4.4 / 16.0, +4.0 / 15.3; dS > 0 in all "
+                 "nine evaluable sites; misclassified 26.8% / 3.7% (reference) and 26.5% / 3.5% (footprint "
                  "contiguity), higher near the line in all ten sites in both")
     write_text("\n".join(lines) + "\n", out / "in_text_numbers.txt")
     print("\n".join(lines))

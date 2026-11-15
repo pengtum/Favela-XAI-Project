@@ -11,12 +11,12 @@ neighbourhoods withheld.
 
 | Item | Script |
 |---|---|
-| Methods 4.4: per-site XGBoost (200 trees, max depth 6, learning rate 0.1), stratified 80/20 split, seed 42 | 01 |
+| Methods 4.4: per-site XGBoost with the xgboost defaults (100 trees, max depth 6, learning rate 0.3), seed 432, unstratified 80/20 split with seed 432 | 01 |
 | Methods 4.6: Tree SHAP, one N × 25 attribution matrix per site (input of main/03-05, the Extended Data figures and most SI analyses) | 01 |
 | SI Table S3, SI Section S4, Results 2.1: per-site test performance; mean accuracy over the ten sites, range of the per-site F1 | 02 |
-| Methods 4.7: out-of-fold predictions (stratified five-fold, XGBoost 100 trees, seed 432) | 03 |
-| Results 2.1, SI Section S5, SI Table S4, Extended Data Fig. 1: 26.8% misclassified within 6 m of the boundary against 3.7% at 90 m or more (ratio 7.2, 95% CI 3.9-19.7), near > far in all ten sites | 04 |
-| Results 2.1, SI Sections S5 and S12: with 250 m blocks and a 200 m buffer, 51.3% against 15.4% (ratio 3.3, 2.0-6.6), near > far in all nine scored sites | 05 |
+| Methods 4.7: out-of-fold predictions (stratified five-fold, seed 432; XGBoost with the tree settings and seed of 01 (100 trees, max depth 6, learning rate 0.3, seed 432) and the intercept of each fit set to the share of class 1 among its training rows, `model_cv.base_score`) | 03 |
+| Results 2.1, SI Section S5, SI Table S4, Extended Data Fig. 1: 26.8% misclassified within 6 m of the boundary against 3.7% at 90 m or more (ratio 7.3, 95% CI 3.9-19.5), near > far in all ten sites | 04 |
+| Results 2.1, SI Sections S5 and S12: with 250 m blocks and a 200 m buffer, 51.6% against 15.5% (ratio 3.3, 2.0-6.5), near > far in all nine scored sites | 05 |
 | Fig. 2: (a) outcome maps of Faz Quem Quer and Morro da Guaíba, (b) per-site test accuracy and the ten-site mean, (c) misclassification rate in 6 m signed-distance bins | 06 |
 
 SI Table S4 and Extended Data Fig. 1 are laid out from the tables of step 04
@@ -37,6 +37,32 @@ python main/02_classification/06_figure2.py              # Fig. 2
 
 01 accepts `--sites <key> ...`. 02 needs 01; 04 needs 03; 06 needs 01-03.
 03 and 05 are independent of 01 and 02.
+
+## Row order
+
+The per-building tables of `main/01_features` (`products.features_gpkg`) are
+read in their own row order, and every output of this folder follows that
+order. Only the split of the main models refers to `uID`:
+
+- **01, main per-site models.** The 80/20 split is drawn with
+  `sklearn.model_selection.train_test_split` (`model_main`: unstratified,
+  seed 432) on the buildings of the site ordered by `uID`, and the training
+  rows are passed to XGBoost in the order `train_test_split` returns them
+  (`favela_xai.model.main_split`). This is how the analysed models were
+  fitted, whatever the row order of the table. Sorting the training rows
+  changes the fitted model in the larger sites, because xgboost's hist
+  quantile sketch depends on the row order.
+- **03 and 05, out-of-fold and blocked predictions** (and SI S9, S12, S14 and
+  S15): folds and random draws are assigned by row position, so they use the
+  rows in table order.
+- **The per-building tables of the analysis** list the buildings in the row
+  order in which the per-site tables of the study were stored: uID order in
+  nine sites; in Rocinha another order (all 36,048 buildings at another
+  position). The out-of-fold results of the paper were computed in that
+  order. A table rebuilt from the raw layers by `main/01_features` lists the
+  buildings in uID order. That order does not change the main models, but it
+  changes Rocinha's out-of-fold folds and random draws, and with them, slightly,
+  the results of 03, 05 and SI S9, S12, S14 and S15.
 
 ## Inputs
 
@@ -64,5 +90,11 @@ python main/02_classification/06_figure2.py              # Fig. 2
   colour every building by its prediction (default, as published), or only the held-out test buildings.
 - `main_02_classification.figure2.misclassified_colours` (by_class | single):
   separate colours for the two error types, or one colour for both.
-- `model_cv.fit_formal_as_class_1` (true | false): class coding of the
-  cross-validation model; the favela probability is returned in both cases.
+- `model_main.fit_formal_as_class_1`, `model_cv.fit_formal_as_class_1`
+  (true | false): class coding of the fit. true = formal settlement fitted as
+  class 1, the coding of the analysed models; the favela probability and Tree
+  SHAP toward favela are returned in both cases (the saved
+  `<site>_model.json` keeps the coding of the fit).
+- `model_cv.base_score` (training_label_mean | xgboost_default): intercept of
+  every validation fit; training_label_mean = share of class 1 among the
+  training rows, with which the validation results were computed.

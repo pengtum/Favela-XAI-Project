@@ -2,20 +2,22 @@
 
 Manuscript items
 * Results 2.4 and SI Section S7: a two-component summary of the raw indicators
-  separates the classes less well (mean per-site accuracy 0.782 and AUC 0.821,
-  against 0.932 and 0.974 for the 25 indicators).
+  separates the classes less well (mean per-site accuracy 0.781 and AUC 0.816,
+  against 0.929 and 0.973 for the 25 indicators).
 * SI Table S6: rows "PC1 + PC2 of the raw 25 indicators" and "Raw 25
   indicators".
 
 The benchmark is computed in appendix/S09_block_complexity_k/03_persite_protocol.py
 with the per-site protocol of SI Section S9 (buildings with a valid
 block-complexity index k and complete indicators and attributions; stratified
-80/20 split, seed 42; XGBoost with 200 trees, max depth 6, learning rate 0.1).
+80/20 split, seed 42; XGBoost with 200 trees, max depth 6, learning rate 0.1,
+seed 42: config ``block_complexity.classifier``, not the main per-site model
+of Methods 4.4).
 The PC1 + PC2 row is a two-component PCA of the 25 raw indicators fitted within
 each site without standardisation (config.yaml 'pca.raw_benchmark'); it is
 distinct from the pooled, standardised attribution PCA of 01_attribution_pca.py.
 This script reads that summary and prints the Results 2.4 numbers. The
-25-indicator reference (0.932 / 0.974) is the "Raw 25 indicators" row of SI
+25-indicator reference (0.929 / 0.973) is the "Raw 25 indicators" row of SI
 Table S6 on the SI S9 evaluation subset, not the per-site test accuracy of SI
 Table S3.
 
@@ -59,7 +61,7 @@ def main() -> None:
     for r in rows.itertuples():
         print(f"  {QUOTED[r.feature_set]:55s} accuracy {r.acc_mean:.3f} (s.d. {r.acc_sd:.3f}), "
               f"AUC {r.auc_mean:.3f} (s.d. {r.auc_sd:.3f}), {int(r.n_sites)} sites")
-    print("  Results 2.4: 0.782 / 0.821 against 0.932 / 0.974")
+    print("  Results 2.4: 0.781 / 0.816 against 0.929 / 0.973")
     print(f"[saved] {out / 'raw_benchmark_summary.csv'}")
 
 

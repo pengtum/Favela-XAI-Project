@@ -5,8 +5,9 @@ Manuscript items
     held-out test)
     for two representative favelas (Faz Quem Quer, Morro da Guaiba), with the
     official 2013 favela boundary.
-  * Fig. 2b: per-site held-out test accuracy, ordered high to low, and the
-    ten-site mean (dashed line).
+  * Fig. 2b: per-site held-out test accuracy of the main per-site models
+    (01_train_models.py, Methods 4.4; SI Table S3), ordered high to low, and
+    the ten-site mean (dashed line).
   * Fig. 2c: misclassification rate by signed distance to the 2013 favela
     boundary (negative inside, positive outside; 6 m bins) from stratified
     five-fold cross-validation (XGBoost, 100 trees, seed 432): all sites with

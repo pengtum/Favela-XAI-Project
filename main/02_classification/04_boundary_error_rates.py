@@ -2,13 +2,13 @@
 
 Manuscript items
   * Results 2.1: 26.8% of the buildings within 6 m of the official favela
-    polygon misclassified against 3.7% of those 90 m or more away (ratio 7.2,
-    95% confidence interval 3.9-19.7); the near rate exceeds the far rate in
+    polygon misclassified against 3.7% of those 90 m or more away (ratio 7.3,
+    95% confidence interval 3.9-19.5); the near rate exceeds the far rate in
     all ten sites.
   * Methods 4.7: rates in 6 m signed-distance bins with Wilson 95% intervals
     per bin and site-bootstrap intervals for contrasts between distance bands.
-  * SI Section S5: the same numbers and, by side, 25.6% against 3.7%
-    (favela-labelled buildings, false negatives) and 40.4% against 3.8%
+  * SI Section S5: the same numbers and, by side, 25.6% against 3.6%
+    (favela-labelled buildings, false negatives) and 40.1% against 3.7%
     (formal-settlement buildings, false positives). SI Table S4 and Extended
     Data Fig. 1 are drawn from the tables written here
     (appendix/S05_boundary_errors).
@@ -200,8 +200,8 @@ def main() -> None:
                      f"{100 * t.loc[blabels[far], 'error_rate']:.1f}% at {blabels[far]}; ratio {ratio:.2f} "
                      f"(site bootstrap 95% CI {rlo:.2f}-{rhi:.2f}); near > far in {kk} of {mm} evaluable sites "
                      f"(two-sided sign test p = {p:.4f})")
-    lines.append("Results 2.1 / SI S5: both sides 26.8% vs 3.7%, ratio 7.2 (3.9-19.7), 10 of 10 sites; "
-                 "inside 25.6% vs 3.7%; outside 40.4% vs 3.8%")
+    lines.append("Results 2.1 / SI S5: both sides 26.8% vs 3.7%, ratio 7.3 (3.9-19.5), 10 of 10 sites; "
+                 "inside 25.6% vs 3.6%; outside 40.1% vs 3.7%")
     t = bands[bands.side == "both"].set_index("band")
     close = t.loc[blabels[:2]]
     lines.append(f"share of all errors within |d| < {be['band_edges_m'][2]} m: "

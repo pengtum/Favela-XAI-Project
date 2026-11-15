@@ -29,22 +29,22 @@ attributions of every building come from a model not trained on it.
 
 ## Main results (SI S15)
 
-* Rankings: Spearman's ρ with the reference is 0.93 on average over the ten
-  sites (range 0.85-0.98) with footprint contiguity and 0.94 (0.87-0.99) over
-  the 24 shared indicators with the indicator omitted, and 0.98 for the pooled
-  ranking in both. Every site keeps at least two of its three leading
+* Rankings: Spearman's ρ with the reference is 0.91 on average over the ten
+  sites (range 0.79-0.97) with footprint contiguity and 0.95 (0.88-0.99) over
+  the 24 shared indicators with the indicator omitted, and 0.97 and 0.96 for
+  the pooled ranking. Every site keeps at least two of its three leading
   indicators in both specifications, and, with the indicator omitted, its
   leading indicator among the other 24. SI S15 compares this agreement with that of the five-fold
-  refits on 250, 500 and 1,000 m blocks with the 200 m buffer (0.86-0.90) and of
+  refits on 250, 500 and 1,000 m blocks with the 200 m buffer (0.85-0.90) and of
   random five-fold refits (0.95) in SI Table S16 (`appendix/S12_spatial_cv`,
   step 11).
 * Boundary transition: x₀ of the summed spatial-distribution attributions is
-  +4.9 m in the reference, +5.0 m with footprint contiguity and +4.6 m with the
-  indicator omitted; for all indicators +4.3, +4.4 and +3.9 m. The six profiles
-  have widths of 14.0-18.3 m. ΔS > 0 in all nine evaluable sites in every
+  +4.8 m in the reference, +5.1 m with footprint contiguity and +4.4 m with the
+  indicator omitted; for all indicators +4.2, +4.4 and +4.0 m. The six profiles
+  have widths of 14.4-18.3 m. ΔS > 0 in all nine evaluable sites in every
   specification.
-* Errors: with footprint contiguity 26.4% of the buildings within 6 m of the
-  line are misclassified, against 3.6% at 90 m or more (26.8% and 3.7% in the
+* Errors: with footprint contiguity 26.5% of the buildings within 6 m of the
+  line are misclassified, against 3.5% at 90 m or more (26.8% and 3.7% in the
   reference, the rates of Fig. 2c); the rate is higher near the line in all ten
   sites in both specifications.
 
