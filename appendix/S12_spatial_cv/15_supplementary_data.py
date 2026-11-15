@@ -4,8 +4,10 @@ Manuscript items: Supplementary Data 1 and 2, the per-fold record (accuracy, AUC
 favela-class F1, class prevalence, training and test sizes) summarised in SI
 Table S14.
 
-File 1: every fold of the square-block, alternative-unit, random and
-pooled leave-site-out designs (8,020 rows with the ten sites). File 2:
+File 1: every fold of the square-block, alternative-unit, random (stratified five-fold
+cross-validation; the unstratified 80/20 split of this pipeline; the stratified 80/20
+split drawn as the reference of SI Fig. S21) and pooled leave-site-out designs
+(8,030 rows with the ten sites). File 2:
 every fold of the held-out favela component (116 rows). Both carry two scoring columns
 (SI S12 'Scoring'):
   'Fold used'              the fold was fitted and its training set holds at least 50
@@ -13,8 +15,8 @@ every fold of the held-out favela component (116 rows). Both carry two scoring c
   'Site scored in design'  the used folds of this site, design, buffer and grid placement
                            give a prediction to at least half of the site's favela
                            buildings (second criterion); matched-control rows carry the value
-                           of the buffered design; the random 80/20 split and the pooled
-                           leave-site-out are scored for every site.
+                           of the buffered design; the two random 80/20 splits and the
+                           pooled leave-site-out are scored for every site.
 A reported value = rows with both columns True; per site the mean over rows, then the
 mean over sites.
 
@@ -43,7 +45,8 @@ DESIGN = {"sq100": "Square blocks 100 m, 5 folds", "sq250": "Square blocks 250 m
           "kmm250": "k-means clusters (about one per 250 m square), 5 folds",
           "kmm500": "k-means clusters (about one per 500 m square), 5 folds",
           "km5": "Five k-means clusters used as the folds",
-          "random_80_20": "Random 80/20 split (refitted in this pipeline)",
+          "random_80_20": "Random 80/20 split, unstratified (refitted in this pipeline)",
+          "random_80_20_stratified": "Random 80/20 split, stratified (reference of SI Fig. S21)",
           "random_skf5": "Random stratified five-fold cross-validation",
           "loso_pooled": "Pooled leave-site-out (trained on the other nine sites)"}
 UNIT = {"square": "square block", "hexagon": "hexagon", "kmeans_many": "k-means cluster (many per site)",
@@ -60,7 +63,7 @@ def scored_flags(df, unit):
     """Second criterion per design x buffer (per site and grid placement)."""
     flag = pd.Series(False, index=df.index)
     for _, g in df.groupby(["design", "buffer"], dropna=False):
-        if g.design.iloc[0] in ("random_80_20", "loso_pooled"):
+        if g.design.iloc[0] in ("random_80_20", "random_80_20_stratified", "loso_pooled"):
             flag[g.index] = True
             continue
         _, cov = scv.apply_rules(g[~g.control], TOT, s, unit=unit)
@@ -80,7 +83,7 @@ def col(df, name):
 
 
 # ----------------------------------------------------------------------------- Supplementary Data 1
-S = F[~F.design.isin(["component", "random_80_20_stratified"])].copy()
+S = F[F.design != "component"].copy()
 S["fold_used"] = scv.rule1_mask(S, s).to_numpy()
 S["site_scored"] = scored_flags(S, ["site", "repeat"]).to_numpy()
 fav, frm = train_counts(S)
@@ -121,4 +124,4 @@ SD2 = pd.DataFrame({
     "Fold used": L.fold_used, "Site scored in design": L.site_scored})
 SD2.to_csv(OUT / "Supplementary_Data_2_component_folds.csv", index=False, float_format="%.6g")
 print(f"Supplementary Data 1: {len(SD1):,} rows; Supplementary Data 2: {len(SD2):,} rows "
-      f"(expected with ten sites: 8,020 and 116)")
+      f"(expected with ten sites: 8,030 and 116)")
